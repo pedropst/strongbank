@@ -1,0 +1,24 @@
+<div style="background-color: #BAE0E7; float:left; width: 50%; border-radius: 30px; padding: 20px; height: 500px; width: 100%;">
+    <p style="color:black">Seja bem-vindo, </p>
+    <p style="font-weight: 1000; color:black">{get_cliente()['nome']}</p>
+    <div style="background-color: #ffffff; border-radius: 30px; height: 350px; padding: 20px;">
+        <p style="font-weight: 1000; color:black">Seu saldo em conta é: R$ {get_saldo():.2f}</p>
+
+        <button style="background-color: #04AA6D; border: none; color: white; padding: 30px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; border-radius: 100%;">   </button>
+        <div style="background-color: #04AA6D; height: 30px; border-radius: 30px; margin-top: 5px;">
+            <a target='_self' href='http://localhost:8501/withdraw'><button style="border: None; background-color:transparent; font-weight: 1000; width: 100%;">SACAR</button></a>
+        </div>
+        <div style="background-color: #04AA6D; height: 30px; border-radius: 30px; margin-top: 5px;">
+            <a target='_self' href='http://localhost:8501/deposit'><button style="border: None; background-color:transparent; font-weight: 1000; width: 100%;">DEPOSITAR</button></a>
+        </div>
+        <div style="background-color: #04AA6D; height: 30px; border-radius: 30px; margin-top: 5px;">
+            <a target='_self' href='http://localhost:8501/transfer'><button style="border: None; background-color:transparent; font-weight: 1000; width: 100%;">TRANSFERIR</button></a>
+        </div>
+        <div style="background-color: #04AA6D; height: 30px; border-radius: 30px; margin-top: 5px;">
+            <a target='_self' href='http://localhost:8501/statement'><button style="border: None; background-color:transparent; font-weight: 1000; width: 100%;">EXTRATO</button></a>
+        </div>
+        <div style="background-color: #04AA6D; height: 30px; border-radius: 30px; margin-top: 5px;">
+            <button style="border: None; background-color:transparent; font-weight: 1000; width: 100%;">GERENCIAR CARTÕES</button>
+        </div>
+    </div>
+</div>

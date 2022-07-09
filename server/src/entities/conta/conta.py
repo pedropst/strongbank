@@ -42,7 +42,7 @@ class Conta(Entity):
         try:
             self.__titulares.remove(titular)
         except TitularNotFoundError as e:
-            e.mensagem = 'Titular não encontrado.'
+            e.mensagem = 'CONTA | Titular não encontrado.'
             raise e
 
     def remover_titular_por_id(self, id_titular: str) -> None:
@@ -52,7 +52,7 @@ class Conta(Entity):
                 titular = cliente
                 self.__titulares.remove(titular)
         if titular is None:
-            raise TitularNotFoundError('Titular não encontrado.')
+            raise TitularNotFoundError('CONTA | Titular não encontrado.')
 ######------------------------------------------------------------
 
     def sacar(self, quantidade: Decimal) -> None:
@@ -76,4 +76,11 @@ class Conta(Entity):
 
     def gerar_extrato(self, data_inicial: datetime, data_final: datetime) -> None:
         pass
+
+    def usar_cartao(self, valor: Decimal) -> bool:
+        if self.saldo >= valor:
+            self.saldo -= valor
+            return True
+        else:
+            raise SaldoInsuficienteParaTransferenciaError('CONTA | Transferência não permitida: saldo insuficiente')
 
