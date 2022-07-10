@@ -33,9 +33,10 @@ def statement_page():
         st.dataframe(df)
         st.legacy_caching.clear_cache()
 
-    home_button_html = "<a target='_self' href='http://localhost:8501/home' style='padding:20px'><input type=button value='Voltar'></a>"
+    home_button_html = "<a target='_self' href='http://localhost:8501/home'><input type=button value='Voltar' class='botao_voltar'></a>"
     st.markdown(home_button_html, unsafe_allow_html=True)
 
-
+    
+st.image(RF"client\resources\images\logo.png")
 statement_page()
 

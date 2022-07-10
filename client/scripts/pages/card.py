@@ -1,5 +1,6 @@
 import requests
 import streamlit as st
+from traitlets import default
 
 from essentials import get_saldo, get_cliente, get_cartao, get_account_info
 from helpers import html_to_fstring_com_iterador
@@ -26,7 +27,7 @@ def card_page():
     
     a, b, c, d, e, f = st.columns(6)
     with b:
-        bloquear = st.select_slider('Bloqueado', options=['SIM', 'NÃO'])
+        bloquear = st.select_slider('Bloqueado', options=['SIM', 'NÃO'], value='NÃO')
 
         if bloquear == 'SIM':
             print('BLOQUEADO')
@@ -37,7 +38,7 @@ def card_page():
     with d:
         fatura = st.selectbox('Fatura', options=['07/22', '08/22', '09/22'])
 
-    home_button_html = "<a target='_self' href='http://localhost:8501/home' style='padding:20px'><input type=button value='Voltar'></a>"
+    home_button_html = "<a target='_self' href='http://localhost:8501/home'><input type=button value='Voltar' class='botao_voltar'></a>"
     st.markdown(home_button_html, unsafe_allow_html=True)
 
 

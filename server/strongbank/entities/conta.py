@@ -44,7 +44,7 @@ class AcoesConta():
         data_final = date(int(dta_final.split('/')[2]), int(dta_final.split('/')[1]), int(dta_final.split('/')[0]))
         transacoes_filtradas = [x for x in transacoes if (x.dta_criacao >= data_inicial and x.dta_criacao <= data_final)]
         extrato_gerado = {}
-        tradutor = {'S':'SAQUE', 'D':'DEPÓSITO', 'T':'TRANSFERÊNCIA', 'TE':'TRANSFERÊNCIA EFETUADA', 'TR':'TRANSFERÊNCIA RECEBIDA'}
+        tradutor = {'S':'SAQUE', 'D':'DEPÓSITO', 'T':'TRANSFERÊNCIA', 'TE':'TRANSFERÊNCIA EFETUADA', 'TR':'TRANSFERÊNCIA RECEBIDA', 'PC':'PAGAMENTO POR CARTÃO'}
         for i, x in enumerate(transacoes_filtradas):
             extrato_gerado[i] = f'{x.dta_criacao.strftime(r"%d/%m/%Y")}: {tradutor[x.tipo]}, no valor de R${x.valor:.2f}'
         return extrato_gerado
@@ -56,6 +56,7 @@ class AcoesConta():
     def usar_cartao(self, valor: Decimal) -> bool:
         if self.dados_sensiveis.saldo >= valor:
             self.dados_sensiveis.saldo -= valor
+            self.dados_sensiveis.save()
             return True
         else:
             raise SaldoInsuficienteParaTransferenciaError('CONTA | Transferência não permitida: saldo insuficiente')

@@ -5,11 +5,12 @@ import requests
 from helpers import html_to_fstring
 
 
-st.set_page_config(page_title="STRONG BANK", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="STRONG BANK - Login", initial_sidebar_state="collapsed")
 
 def login_page():
     with open('client/styles/style.css', 'r') as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+        css_to_inject = f.read()
+        st.markdown(f'<style>{css_to_inject}</style>', unsafe_allow_html=True)
 
     with open('client/styles/login_page.html', 'r', encoding='utf8') as f:
         html = f.read()
@@ -36,5 +37,6 @@ def login_page():
     st.markdown(new_account_html, unsafe_allow_html=True)
 
 
+st.image(RF"client\resources\images\logo.png")
 login_page()
 

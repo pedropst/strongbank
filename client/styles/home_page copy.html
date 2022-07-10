@@ -1,26 +1,23 @@
-<!-- <div style="display: flexbox; justify-content: center; align-items: center;">
-    <p><img src="../resources/images/logo.png"></p>
-</div> -->
-<div style="background-color: rgba(0, 0, 0, 0.28); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+<div style="background-color: rgba(0, 0, 0, 0.28); width: 980px; height: 980px; border-radius: 12px; position: relative; justify-content: space-evenly; padding: 3%;">
     <div style="border: 2px solid #7BD2B2; width: 60%; border-radius: 12px; position: relative; height: 50px; padding: 10px; margin-bottom: 50px;">
         <span class="dot" style="height: 14px; width: 14px; background-color: white; border-radius: 50%; display: inline-block; position: absolute; left: -10px; top: 50%; -ms-transform: translateY(-50%); transform: translateY(-50%);"></span>
         <p style=" font-size: 20px; font-weight: 1000; color:white; position: absolute; top: 50%; -ms-transform: translateY(-50%); transform: translateY(-50%);">Seja bem-vindo(a), {get_cliente()['nome']}</p>
     </div>
-    <div style="background-color: rgba(123, 210, 178, 0.32); border-radius: 12px; width: 100%; padding: 20px;">
+    <div style="background-color: rgba(123, 210, 178, 0.32); border-radius: 12px; width: 928px; height: 625px; padding: 20px;">
         <p style="font-weight: 1000; color:white;">Seu saldo em conta é: R$ {get_saldo():.2f}</p>
-        <div style="background-color: white; height: 36px; border-radius: 12px; margin-top: 5px; color: #3D6C50; position: relative;">
+        <div style="background-color: white; height: 60px; border-radius: 12px; margin-top: 5px; color: #3D6C50; position: relative;">
             <a target='_self' href='http://localhost:8501/withdraw'><button style="border: None; background-color:transparent; font-weight: 1000; width: 100%; position: absolute; top: 50%; -ms-transform: translateY(-50%); transform: translateY(-50%); font-size: 20px;">SACAR</button></a>
         </div>
-        <div style="background-color: white; height: 36px; border-radius: 12px; margin-top: 5px; color: #3D6C50; position: relative;">
+        <div style="background-color: white; height: 60px; border-radius: 12px; margin-top: 5px; color: #3D6C50; position: relative;">
             <a target='_self' href='http://localhost:8501/deposit'><button style="border: None; background-color:transparent; font-weight: 1000; width: 100%; position: absolute; top: 50%; -ms-transform: translateY(-50%); transform: translateY(-50%); font-size: 20px;">DEPOSITAR</button></a>
         </div>
-        <div style="background-color: white; height: 36px; border-radius: 12px; margin-top: 5px; color: #3D6C50; position: relative;">
+        <div style="background-color: white; height: 60px; border-radius: 12px; margin-top: 5px; color: #3D6C50; position: relative;">
             <a target='_self' href='http://localhost:8501/transfer'><button style="border: None; background-color:transparent; font-weight: 1000; width: 100%; position: absolute; top: 50%; -ms-transform: translateY(-50%); transform: translateY(-50%); font-size: 20px;">TRANSFERIR</button></a>
         </div>
-        <div style="background-color: white; height: 36px; border-radius: 12px; margin-top: 5px; color: #3D6C50; position: relative;">
+        <div style="background-color: white; height: 60px; border-radius: 12px; margin-top: 5px; color: #3D6C50; position: relative;">
             <a target='_self' href='http://localhost:8501/statement'><button style="border: None; background-color:transparent; font-weight: 1000; width: 100%; position: absolute; top: 50%; -ms-transform: translateY(-50%); transform: translateY(-50%); font-size: 20px;">EXTRATO</button></a>
         </div>
-        <div style="background-color: white; height: 36px; border-radius: 12px; margin-top: 5px; color: #3D6C50; position: relative;">
+        <div style="background-color: white; height: 60px; border-radius: 12px; margin-top: 5px; color: #3D6C50; position: relative;">
             <a target='_self' href='http://localhost:8501/card'><button style="border: None; background-color:transparent; font-weight: 1000; width: 100%; position: absolute; top: 50%; -ms-transform: translateY(-50%); transform: translateY(-50%); font-size: 20px;">GERENCIAR CARTÕES</button></a>
         </div>
     </div>

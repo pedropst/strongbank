@@ -30,9 +30,10 @@ def withdraw_page():
         st.legacy_caching.clear_cache()
         st.experimental_rerun()
 
-    home_button_html = "<a target='_self' href='http://localhost:8501/home'><input type=button value='Voltar'></a>"
+    home_button_html = "<a target='_self' href='http://localhost:8501/home'><input type=button value='Voltar' class='botao_voltar'></a>"
     st.markdown(home_button_html, unsafe_allow_html=True)
 
 
+st.image(RF"client\resources\images\logo.png")
 withdraw_page()
 

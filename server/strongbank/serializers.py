@@ -1,7 +1,16 @@
 # from strongbank.models import Cliente, Conta, ContaDadosSensiveis, Documento
-from strongbank.models import Cliente, Conta, ContaDadosSensiveis, Transacao, Cartao, CartaoDadosSensiveis
+from attr import field
+from strongbank.models import Cliente, Conta, ContaDadosSensiveis, Transacao, Cartao, CartaoDadosSensiveis, Fatura, Parcela
 from rest_framework import serializers
 from django.contrib.auth.models import User
+
+class PagarCreditoSerializer(serializers.Serializer):
+    class Meta:
+        fields = ['valor', 'parcelas']
+
+class PagarDebitoSerializer(serializers.Serializer):
+    class Meta:
+        fields = ['valor']
 
 class TransferirSerializer(serializers.Serializer):
     class Meta:
@@ -51,6 +60,18 @@ class ClienteSerializer(serializers.ModelSerializer):
                 'Campo de CPF e CNPJ preenchidos, escolher somente um.'})
         return data
 
+class FaturaSerializer(serializers.ModelSerializer):
+    cartao = serializers.ReadOnlyField(source='cartao.id')
+    class Meta:
+        model = Fatura
+        fields = ['id', 'cartao', 'mes_ref', 'ano_ref', 'total', 'parcial']
+
+class ParcelaSerializer(serializers.ModelSerializer):
+    fatura = serializers.ReadOnlyField(source='fatura.id')
+    class Meta:
+        model = Parcela
+        fields = ['id', 'fatura', 'descricao', 'valor']
+
 class CartaoDadosSensiveisSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartaoDadosSensiveis
@@ -62,7 +83,7 @@ class CartaoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cartao
-        fields = ['nome', 'numeracao', 'mes_validade', 'ano_validade', 'cvv']
+        fields = ['nome', 'numeracao', 'mes_validade', 'ano_validade', 'cvv', 'limite_total', 'limite_desbloqueado']
 
 
 

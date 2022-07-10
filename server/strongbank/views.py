@@ -1,12 +1,14 @@
+from datetime import datetime
+from decimal import Decimal
 from random import randint
 from django.db import transaction
 from rest_framework.response import Response
 
 from rest_framework import viewsets
 from rest_framework import permissions
-from strongbank.models import Cliente, Conta, ContaDadosSensiveis, Transacao, Cartao, CartaoDadosSensiveis
+from strongbank.models import Cliente, Conta, ContaDadosSensiveis, Transacao, Cartao, CartaoDadosSensiveis, Fatura, Parcela
 from strongbank.permissions import IsOwnerOrReadOnly, IsUpdateProfile
-from strongbank.serializers import ClienteSerializer, ContaSerializer, DepositarSerializer, ExtratoSerializer, SacarSerializer, SaldoSerializer, TransacaoSerializer, TransferirSerializer, UserSerializer, CartaoSerializer
+from strongbank.serializers import ClienteSerializer, ContaSerializer, DepositarSerializer, ExtratoSerializer, SacarSerializer, SaldoSerializer, TransacaoSerializer, TransferirSerializer, UserSerializer, CartaoSerializer, FaturaSerializer, PagarCreditoSerializer, PagarDebitoSerializer
 from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework import serializers
@@ -29,6 +31,77 @@ class UserList(generics.ListAPIView):
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+class PagarCreditoViewset(viewsets.ViewSet):
+    serializer_class = PagarCreditoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @transaction.atomic # To create either BOTH or NONE
+    def create(self, request):
+        cliente = Cliente.objects.get(dono=request.user)
+        conta = Conta.objects.get(cliente=cliente)
+        cartao = Cartao.objects.filter(conta=conta).all().get(numeracao=request.data['numeracao'])
+        faturas = Fatura.objects.filter(cartao=cartao).all()
+        
+        if len(faturas) > 0:
+            faturas = sorted(faturas, key=lambda x: datetime(x.ano_ref, x.mes_ref, 1))
+
+        faturas = [f for f in faturas if datetime(f.ano_ref, f.mes_ref, 1) >= datetime.today()]
+        if request.data['parcelas'] > 12:
+            pass #LEVANTAR ERRO (PROGRAMADOR NÃO TEVE TEMPO -> ESSE CARTÃO SÓ ACEITA EM ATÉ 12 VEZES)
+        if cartao.pagar_credito(request.data['valor']):
+            if len(faturas) == 0:
+                for p in range(request.data['parcelas'] + 1)[1:]:
+                    nova_fatura = Fatura.objects.create(mes_ref = datetime.today().month + p if datetime.today().month + p <= 12 else datetime.today().month + p - 12,
+                                                        ano_ref = datetime.today().year if datetime.today().month + p <= 12 else datetime.today().year + 1,
+                                                        total= Decimal(request.data['valor']/request.data['parcelas']),
+                                                        parcial= Decimal(0),
+                                                        cartao = cartao)
+                    nova_parcela = Parcela.objects.create(fatura= nova_fatura,
+                                        valor= Decimal(request.data['valor']/request.data['parcelas']),
+                                        descricao= request.data['descricao'])
+                    nova_fatura.save()
+                    nova_parcela.save()
+            elif len(faturas) <= request.data['parcelas']:
+                for f in faturas:
+                    nova_parcela = Parcela.objects.create(fatura= f,
+                                                          valor= Decimal(request.data['valor']/request.data['parcelas']),
+                                                          descricao= request.data['descricao'])
+                    f.total += Decimal(request.data['valor']/request.data['parcelas'])
+                    f.save()
+                    nova_parcela.save()
+                for p in range(request.data['parcelas'] + 1 - len(faturas))[1:]:
+                    nova_fatura = Fatura.objects.create(mes_ref = datetime.today().month + p if datetime.today().month + p <= 12 else datetime.today().month + p - 12,
+                                                        ano_ref = datetime.today().year if datetime.today().month + p <= 12 else datetime.today().year + 1,
+                                                        total= Decimal(request.data['valor']/request.data['parcelas']),
+                                                        parcial= Decimal(0),
+                                                        cartao = cartao)
+                    nova_parcela = Parcela.objects.create(fatura= nova_fatura,
+                                                          valor= Decimal(request.data['valor']/request.data['parcelas']),
+                                                          descricao= request.data['descricao'])
+                    nova_fatura.save()
+                    nova_parcela.save()
+
+            return Response({'status': 'Pagamento realizado com sucesso!'}, status=200)
+        else:
+            return Response({'status': 'Pagamento NÃO realizado!'}, status=400)
+
+class PagarDebitoViewset(viewsets.ViewSet):
+    serializer_class = PagarDebitoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @transaction.atomic # To create either BOTH or NONE
+    def create(self, request):
+        cliente = Cliente.objects.get(dono=request.user)
+        conta = Conta.objects.get(cliente=cliente)
+        cartao = Cartao.objects.filter(conta=conta).all().get(numeracao=request.data['numeracao'])
+
+        if cartao.pagar_debito(request.data['valor'], conta):
+            nova_transacao = Transacao.objects.create(tipo='PC',
+                                                      cliente = cliente,
+                                                      valor = request.data['valor'])
+            nova_transacao.save()
+        return Response({'status': 'Pagamento realizado com sucesso!'}, status=200)
 
 class SacarViewset(viewsets.ViewSet):
     serializer_class = SacarSerializer
@@ -86,6 +159,7 @@ class DepositarViewset(viewsets.ViewSet):
         # if AC.depositar(conta, request.data['valor']):
         #     return Response({'status': 'OK'}, status=200)
 
+
 class TransferirViewset(viewsets.ViewSet):
     serializer_class = TransferirSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -116,6 +190,19 @@ class TransferirViewset(viewsets.ViewSet):
         # if AC.transferir(conta_remetente, request.data['valor'], conta_destinatario):
             # return Response({'status': 'OK'}, status=200)
 
+class FaturaViewset(viewsets.ModelViewSet):
+    serializer_class = FaturaSerializer
+    permission_classes = [IsOwnerOrReadOnly]
+
+    def list(self, request):
+        cliente = Cliente.objects.get(dono=request.user)
+        conta = Conta.objects.get(cliente=cliente)
+        cartao = Cartao.objects.filter(conta=conta).all().get(numeracao=request.data['numeracao'])
+        queryset =  Fatura.objects.filter(cartao=cartao).all()
+
+        serializer = FaturaSerializer(queryset, many=True)
+        return Response(serializer.data, status=200)
+
 
 class ClienteViewset(viewsets.ModelViewSet):
     serializer_class = ClienteSerializer
@@ -137,11 +224,11 @@ class ClienteViewset(viewsets.ModelViewSet):
         return Response(serializer.data, status=201)
 
     def list(self, request, *args, **kwargs):
-        queryset = Cliente.objects.get(dono=request.user)
         if request.user.is_superuser:
             queryset = Cliente.objects.all()
             serializer = ClienteSerializer(queryset, many=True)
         else:
+            queryset = Cliente.objects.get(dono=request.user)
             serializer = ClienteSerializer(queryset)
         return Response(serializer.data, status=200)
 
@@ -223,7 +310,10 @@ class CartaoViewset(viewsets.ModelViewSet):
                                                 tipo=request.data['tipo'],
                                                 dados_sensiveis=dados,
                                                 nome=nome,
-                                                numeracao=numeracao)
+                                                numeracao=numeracao,
+                                                limite_total=5000,
+                                                limite_desbloqueado=3000,
+                                                limite_disponivel=5000)
             novo_cartao.save()
 
             serializer = CartaoSerializer(novo_cartao)

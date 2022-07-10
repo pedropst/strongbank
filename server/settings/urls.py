@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
-from strongbank.views import ClienteViewset, ContaViewset, DepositarViewset, ExtratoViewset, SacarViewset, TransferirViewset, SaldoViewset, UserCreate, UserDetail, UserList, CartaoViewset
+from strongbank.views import ClienteViewset, ContaViewset, DepositarViewset, ExtratoViewset, SacarViewset, TransferirViewset, SaldoViewset, UserCreate, UserDetail, UserList, CartaoViewset, FaturaViewset, PagarCreditoViewset, PagarDebitoViewset
 # from strongbank.views import ClienteViewset, ContaViewset
 
 router = routers.DefaultRouter()
@@ -13,6 +13,9 @@ router.register(r'transferir', TransferirViewset, basename='Transferir')
 router.register(r'saldo', SaldoViewset, basename='Saldo')
 router.register(r'extrato', ExtratoViewset, basename='Extrato')
 router.register(r'cartao', CartaoViewset, basename='Cartao')
+router.register(r'fatura', FaturaViewset, basename='Fatura')
+router.register(r'pagarcredito', PagarCreditoViewset, basename='PagarCredito')
+router.register(r'pagardebito', PagarDebitoViewset, basename='PagarDebito')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

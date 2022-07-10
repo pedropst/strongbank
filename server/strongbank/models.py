@@ -8,6 +8,7 @@ from django.core.signing import Signer
 import uuid
 
 from strongbank.entities.conta import AcoesConta
+from strongbank.entities.credito_debito import CartaoCreditoEDebito
 
 class Cliente(models.Model):
     tipos_clientes = [('PF', 'Física'), ('PJ', 'Jurídica')]
@@ -60,7 +61,7 @@ class Conta(AcoesConta, models.Model):
         return self.cliente.nome
 
 class Transacao(models.Model):
-    acoes_tipo = [('S','Saque'), ('D','Deposito'), ('TE','Transferência Efetuada'), ('TR','Transferência Recebida'), ('C','Cartão')]
+    acoes_tipo = [('S','Saque'), ('D','Deposito'), ('TE','Transferência Efetuada'), ('TR','Transferência Recebida'), ('C','Cartão'), ('PC', 'Pagamento por Cartão')]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # cliente = models.OneToOneField(Cliente, on_delete=models.CASCADE, unique=False)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
@@ -84,7 +85,7 @@ class CartaoDadosSensiveis(models.Model):
     #     super().save(*args, **kwargs)
 
 
-class Cartao(models.Model):
+class Cartao(CartaoCreditoEDebito, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     conta = models.ForeignKey(Conta, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=20, choices=[('0', 'Credito'), 
@@ -97,7 +98,11 @@ class Cartao(models.Model):
     bloqueado = models.BooleanField(editable=False, default=True)
     dta_criacao = models.DateField(auto_now=True)
     numeracao = models.CharField(max_length=16, editable=False)
-    dados_sensiveis = models.OneToOneField(CartaoDadosSensiveis, on_delete=models.CASCADE)   
+    dados_sensiveis = models.OneToOneField(CartaoDadosSensiveis, on_delete=models.CASCADE)
+    limite_total = models.DecimalField(max_digits=15, decimal_places=5, default=Decimal(0))
+    limite_disponivel = models.DecimalField(max_digits=15, decimal_places=5, default=Decimal(0))
+    limite_desbloqueado = models.DecimalField(max_digits=15, decimal_places=5, default=Decimal(0))
+    bandeira = models.CharField(max_length=20)
     
     def __str__(self) -> str:
         return self.nome
@@ -121,7 +126,7 @@ class Fatura(models.Model):
     
 class Parcela(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    idfatura = models.ForeignKey(Fatura, on_delete=models.CASCADE)
+    fatura = models.ForeignKey(Fatura, on_delete=models.CASCADE)
     descricao = models.CharField(max_length=20, editable=True)
     valor = models.DecimalField(max_digits=15, decimal_places=5, default=Decimal(0))
     dta_criacao = models.DateField(auto_now=True)
