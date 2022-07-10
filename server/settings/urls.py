@@ -1,8 +1,11 @@
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
-from strongbank.views import ClienteViewset, ContaViewset, DepositarViewset, ExtratoViewset, SacarViewset, TransferirViewset, SaldoViewset, UserCreate, UserDetail, UserList, CartaoViewset, FaturaViewset, PagarCreditoViewset, PagarDebitoViewset
-# from strongbank.views import ClienteViewset, ContaViewset
+from strongbank.views.cliente_viewset import ClienteViewset
+from strongbank.views.conta_viewset import ContaViewset, DepositarViewset, ExtratoViewset, SacarViewset, TransferirViewset, SaldoViewset
+from strongbank.views.user_viewset import UserCreate, UserDetail, UserList
+from strongbank.views.cartao_viewset import CartaoViewset, PagarCreditoViewset, PagarDebitoViewset
+from strongbank.views.fatura_viewset import FaturaViewset
 
 router = routers.DefaultRouter()
 router.register(r'cliente', ClienteViewset, basename='Cliente')
