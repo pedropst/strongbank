@@ -1,5 +1,5 @@
 # from strongbank.models import Cliente, Conta, ContaDadosSensiveis, Documento
-from strongbank.models import Cliente, Conta, ContaDadosSensiveis, Transacao
+from strongbank.models import Cliente, Conta, ContaDadosSensiveis, Transacao, Cartao, CartaoDadosSensiveis
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
@@ -40,7 +40,7 @@ class ClienteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cliente
-        fields=['nome', 'endereco', 'celular', 'documento', 'tipo']
+        fields = ['nome', 'endereco', 'celular', 'documento', 'tipo']
         depth = 1
 
     
@@ -51,16 +51,23 @@ class ClienteSerializer(serializers.ModelSerializer):
                 'Campo de CPF e CNPJ preenchidos, escolher somente um.'})
         return data
 
+class CartaoDadosSensiveisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartaoDadosSensiveis
+        fields = ['id', 'cvv']
 
-# class DocumentoSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Documento
-#         fields = ['id', 'cpf', 'cnpj']
+class CartaoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cartao
+        fields = ['nome', 'numeracao', 'mes_validade', 'ano_validade']
+        depth = 1
+
+
 
 class ContaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conta
-        fields= ['id', 'cliente', 'agencia', 'numero', 'tipo']
+        fields = ['id', 'cliente', 'agencia', 'numero', 'tipo']
 
 class ContaDadosSensiveisSerializer(serializers.ModelSerializer):
     class Meta:

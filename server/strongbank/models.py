@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
+import os
 from random import randint
 from django.db import models
-# from django_cryptography.fields import encrypt
+from django_cryptography.fields import encrypt
 from django.core.signing import Signer
 import uuid
 
@@ -75,41 +76,32 @@ class Transacao(models.Model):
     def __str__(self) -> str:
         return f'{self.tipo} -> {self.valor}'
 
+class CartaoDadosSensiveis(models.Model):
+    cvv = models.CharField(max_length=3, editable=False)
+
+    # def save(self, *args, **kwargs):
+    #     self.cvv = encrypt(self.cvv, os.getenv('SECRET_KET'))
+    #     super().save(*args, **kwargs)
+
 
 class Cartao(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     conta = models.ForeignKey(Conta, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=20, choices=[('0', 'Credito'), 
                        ('1', 'Debito'), ('2', 'Credito e Debito')], 
-                       default=0)
+                       default=1)
     dia_vencimento = models.IntegerField(choices=[(x+1, f'Dia {x+1}') for x in range(28)])
-    nome = models.CharField(max_length=20, editable=False, default='')
+    nome = models.CharField(max_length=30, editable=False, default='')
     mes_validade = models.CharField(max_length=2, editable=False, default=str(datetime.today().month))
-    ano_validade = models.CharField(max_length=4, editable=False, default=str(datetime.today().year))
+    ano_validade = models.CharField(max_length=4, editable=False, default=str(datetime.today().year + 8))
     bloqueado = models.BooleanField(editable=False, default=True)
     dta_criacao = models.DateField(auto_now=True)
-
-    def save(self, *args, **kwargs):
-        conta_relacionada = self.conta.cliente.nome
-        nome_separado = conta_relacionada.split(' ')
-        self.nome = f"{nome_separado[0]} {nome_separado[-1]}"
-        super().save(*args, **kwargs)
-    
+    numeracao = models.CharField(max_length=16, editable=False)
+    dados_sensiveis = models.OneToOneField(CartaoDadosSensiveis, on_delete=models.CASCADE)   
     
     def __str__(self) -> str:
-
-        return self.conta.cliente.nome
+        return self.nome
     
-class CartaoDadosSensiveis(models.Model):
-    idcartao = models.ForeignKey(Cartao, on_delete=models.CASCADE)
-    cvv = models.CharField(max_length=3, editable=False)
-    numero = models.CharField(max_length=16, editable=False)
-
-    def save(self, *args, **kwargs):
-        self.idcartao = encrypt(self.idcartao)
-        self.cvv = encrypt(self.cvv)
-        self.numero = encrypt(self.numero)
-        super().save(*args, **kwargs)
 
 class Fatura(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

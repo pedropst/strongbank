@@ -2,13 +2,18 @@ div.css-1n76uvr.e1tzin5v0{
     height: 500px;
     border-radius: 30px;
     padding: 20px;
-    background-color: #BAE0E7;
+
+    background-image: linear-gradient(45deg, #85FFBD 0%, #FFFB7D 100%);
 }
+
+/* section.main.css-1v3fvcr.egzxvld3{
+    background-color: #04AA6D;
+} */
 
 div.css-1p05t8e.epcbefy1{
     border-radius: 30px;
     padding: 20px;
-    background-color: white;
+    background-color: rgb(14, 17, 23);
 }
 
 div.element-container.css-gbnw8u.e1tzin5v3{
@@ -24,7 +29,7 @@ label.css-16huue1.effi0qh3{
 
 input.st-bb.st-by.st-bz.st-c0.st-c1.st-c2.st-c3.st-c4.st-c5.st-c6.st-c7.st-b7.st-c8.st-c9.st-ca.st-cb.st-cc.st-cd.st-ce.st-ae.st-af.st-ag.st-ah.st-ai.st-aj.st-bx.st-cf.st-cg{
     width: 100%;
-    height: 30px;
+    height: 29px;
     background-color: #04AA6D;
 }
 
@@ -80,4 +85,8 @@ div.st-cc{
 
 button.st-b4.st-ch.st-c3.st-c4.st-c1.st-c2.st-ci.st-cj.st-ck.st-c5.st-bv{
     background-color: #04AA6D;
+}
+
+div.element-container.css-gbnw8u.e1tzin5v3{
+    margin-top: 25px;
 }

@@ -1,17 +1,18 @@
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
-from strongbank.views import ClienteViewSet, ContaViewSet, DepositarViewSet, ExtratoViewset, SacarViewSet, TransferirViewSet, SaldoViewSet, UserCreate, UserDetail, UserList
-# from strongbank.views import ClienteViewSet, ContaViewSet
+from strongbank.views import ClienteViewset, ContaViewset, DepositarViewset, ExtratoViewset, SacarViewset, TransferirViewset, SaldoViewset, UserCreate, UserDetail, UserList, CartaoViewset
+# from strongbank.views import ClienteViewset, ContaViewset
 
 router = routers.DefaultRouter()
-router.register(r'clientes', ClienteViewSet, basename='Cliente')
-router.register(r'contas', ContaViewSet, basename='Conta')
-router.register(r'sacar', SacarViewSet, basename='Sacar')
-router.register(r'depositar', DepositarViewSet, basename='Depositar')
-router.register(r'transferir', TransferirViewSet, basename='Transferir')
-router.register(r'saldo', SaldoViewSet, basename='Saldo')
+router.register(r'cliente', ClienteViewset, basename='Cliente')
+router.register(r'conta', ContaViewset, basename='Conta')
+router.register(r'sacar', SacarViewset, basename='Sacar')
+router.register(r'depositar', DepositarViewset, basename='Depositar')
+router.register(r'transferir', TransferirViewset, basename='Transferir')
+router.register(r'saldo', SaldoViewset, basename='Saldo')
 router.register(r'extrato', ExtratoViewset, basename='Extrato')
+router.register(r'cartao', CartaoViewset, basename='Cartao')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

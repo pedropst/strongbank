@@ -24,7 +24,7 @@ def withdraw_page():
         submit = st.form_submit_button(label='Confirmar')
 
     if value and password and submit:
-        data = {"valor":float(value)}
+        data = {"valor": float(value)}
         requests.post(url='http://127.0.0.1:8000/sacar/', json=data, auth=get_account_info())
 
         st.legacy_caching.clear_cache()

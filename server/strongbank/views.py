@@ -1,13 +1,15 @@
+from random import randint
 from django.db import transaction
 from rest_framework.response import Response
 
 from rest_framework import viewsets
 from rest_framework import permissions
-from strongbank.models import Cliente, Conta, ContaDadosSensiveis, Transacao
+from strongbank.models import Cliente, Conta, ContaDadosSensiveis, Transacao, Cartao, CartaoDadosSensiveis
 from strongbank.permissions import IsOwnerOrReadOnly, IsUpdateProfile
-from strongbank.serializers import ClienteSerializer, ContaSerializer, DepositarSerializer, ExtratoSerializer, SacarSerializer, SaldoSerializer, TransacaoSerializer, TransferirSerializer, UserSerializer
+from strongbank.serializers import ClienteSerializer, ContaSerializer, DepositarSerializer, ExtratoSerializer, SacarSerializer, SaldoSerializer, TransacaoSerializer, TransferirSerializer, UserSerializer, CartaoSerializer
 from django.contrib.auth.models import User
 from rest_framework import generics
+from rest_framework import serializers
 
 class UserCreate(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -28,7 +30,7 @@ class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-class SacarViewSet(viewsets.ViewSet):
+class SacarViewset(viewsets.ViewSet):
     serializer_class = SacarSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -44,7 +46,7 @@ class SacarViewSet(viewsets.ViewSet):
         nova_transacao.save()
         return Response({'status': 'Saque efetuado com sucesso!'}, status=200)
 
-class SaldoViewSet(viewsets.ViewSet):
+class SaldoViewset(viewsets.ViewSet):
     serializer_class = SaldoSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -66,7 +68,7 @@ class ExtratoViewset(viewsets.ViewSet):
         # serializer = [ExtratoSerializer(x) for x in extrato]
         return Response(extrato, status=200)
 
-class DepositarViewSet(viewsets.ViewSet):
+class DepositarViewset(viewsets.ViewSet):
     serializer_class = DepositarSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -84,7 +86,7 @@ class DepositarViewSet(viewsets.ViewSet):
         # if AC.depositar(conta, request.data['valor']):
         #     return Response({'status': 'OK'}, status=200)
 
-class TransferirViewSet(viewsets.ViewSet):
+class TransferirViewset(viewsets.ViewSet):
     serializer_class = TransferirSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -115,7 +117,7 @@ class TransferirViewSet(viewsets.ViewSet):
             # return Response({'status': 'OK'}, status=200)
 
 
-class ClienteViewSet(viewsets.ModelViewSet):
+class ClienteViewset(viewsets.ModelViewSet):
     serializer_class = ClienteSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
@@ -143,7 +145,7 @@ class ClienteViewSet(viewsets.ModelViewSet):
             serializer = ClienteSerializer(queryset)
         return Response(serializer.data, status=200)
 
-class ContaViewSet(viewsets.ModelViewSet):
+class ContaViewset(viewsets.ModelViewSet):
     serializer_class = ContaSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -177,3 +179,72 @@ class ContaViewSet(viewsets.ModelViewSet):
         else:
             serializer = ContaSerializer(queryset)
         return Response(serializer.data, status=200)
+
+
+class CartaoViewset(viewsets.ModelViewSet):
+    serializer_class = CartaoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        cartoes = Cartao.objects.all()
+        return cartoes
+
+    @transaction.atomic # To create either BOTH or NONE
+    def create(self, request, *args, **kwargs):
+        if len(self.list(request, *args, **kwargs).data) <= 3:
+            cliente = Cliente.objects.get(dono=request.user)
+            conta = Conta.objects.get(cliente=cliente)
+            dados = CartaoDadosSensiveis.objects.create(cvv=str(randint(100,999)))
+            dados.save()
+
+            nome_cliente = cliente.nome
+            nomes = []
+            if len(nome_cliente.split(' ')) == 2:
+                nomes.append(nome_cliente.split(' ')[0])
+                nomes.append(nome_cliente.split(' ')[1])
+            else:
+                nomes.append(nome_cliente.split(' ')[0])
+                nomes.extend([n[0] for n in nome_cliente.split(' ')[1:-1]])
+                nomes.append(nome_cliente.split(' ')[-1])
+
+            nome = ''
+            for n in nomes:
+                nome += f'{n} '
+            nome = nome[:-1]
+
+
+            todos_numeros = [x.numeracao for x in list(Cartao.objects.all())]
+            numeracao = '5431' + str(randint(10**11, (10**12)-1))
+            while numeracao in todos_numeros :
+                numeracao = '5431' + str(randint(10**11, (10**12)-1))
+
+            novo_cartao = Cartao.objects.create(conta=conta,
+                                                dia_vencimento=request.data['dia_vencimento'], 
+                                                tipo=request.data['tipo'],
+                                                dados_sensiveis=dados,
+                                                nome=nome,
+                                                numeracao=numeracao)
+            novo_cartao.save()
+
+            serializer = CartaoSerializer(novo_cartao)
+
+            return Response(serializer.data, status=201)
+        else:
+            raise serializers.ValidationError(
+                            {'Número máximo de cartão atingido':
+                            'Cliente já possui 3 cartões.'})
+
+    def list(self, request, *args, **kwargs):
+        cliente = Cliente.objects.get(dono=request.user)
+        conta = Conta.objects.get(cliente=cliente)
+        queryset = Cartao.objects.filter(conta=conta).all()
+        if request.user.is_superuser:
+            queryset = Cartao.objects.all()
+            serializer = CartaoSerializer(queryset, many=True)
+        else:
+            serializer = CartaoSerializer(queryset,  many=True)
+        return Response(serializer.data, status=200)
+
+
+
+
