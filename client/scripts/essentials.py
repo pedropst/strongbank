@@ -16,5 +16,10 @@ def get_account_info():
 def get_cliente():
     return requests.get(url='http://127.0.0.1:8000/cliente/', auth=get_account_info()).json()
 
+def get_cartao():
+    return requests.get(url='http://127.0.0.1:8000/cartao/', auth=get_account_info()).json()
+    
 def get_saldo():
     return requests.get(url='http://127.0.0.1:8000/saldo/', auth=get_account_info()).json()['Seu saldo é: ']
+
+

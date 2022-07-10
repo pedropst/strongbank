@@ -3,7 +3,7 @@ from decimal import Decimal
 import os
 from random import randint
 from django.db import models
-from django_cryptography.fields import encrypt
+# from django_cryptography.fields import encrypt
 from django.core.signing import Signer
 import uuid
 

@@ -57,10 +57,12 @@ class CartaoDadosSensiveisSerializer(serializers.ModelSerializer):
         fields = ['id', 'cvv']
 
 class CartaoSerializer(serializers.ModelSerializer):
+    # dados_sensiveis = serializers.PrimaryKeyRelatedField(many=False, queryset=CartaoDadosSensiveis.objects.all())
+    cvv = serializers.ReadOnlyField(source='dados_sensiveis.cvv')
+
     class Meta:
         model = Cartao
-        fields = ['nome', 'numeracao', 'mes_validade', 'ano_validade']
-        depth = 1
+        fields = ['nome', 'numeracao', 'mes_validade', 'ano_validade', 'cvv']
 
 
 
