@@ -19,12 +19,11 @@ def home_page_novo():
             html_to_inject = html_to_fstring(html)
             st.markdown(html_to_inject, unsafe_allow_html=True)
 
-
     home_button_html = "<a target='_self' href='http://localhost:8501/login'><input type=button value='Voltar' class='botao_voltar'></a>"
     st.markdown(home_button_html, unsafe_allow_html=True)
 
 
-st.image(RF"client\resources\images\logo.png")
+# st.image(RF"client\resources\images\logo.png")
 home_page_novo()
 
 

@@ -25,6 +25,12 @@ def transfer_page():
         password = st.text_input('Senha:', type='password')
         submit = st.form_submit_button(label='Confirmar')
 
+    html = """    <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+        <img src='data:image/png;base64,{img_to_bytes()}' style="width: 25%; height: auto;" class="img-fluid">
+        </div>"""
+    html_to_inject = html_to_fstring(html)
+    st.markdown(html_to_inject, unsafe_allow_html=True)
+
     if receiver_document and value and submit:
         data = {
                 "valor": value,
@@ -39,6 +45,6 @@ def transfer_page():
     st.markdown(home_button_html, unsafe_allow_html=True)
 
 
-st.image(RF"client\resources\images\logo.png")
+# st.image(RF"client\resources\images\logo.png")
 transfer_page()
 

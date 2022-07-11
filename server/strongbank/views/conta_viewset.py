@@ -7,7 +7,8 @@ from strongbank.models.cliente import Cliente
 from strongbank.models.conta import Conta, ContaDadosSensiveis
 from strongbank.models.transacao import Transacao
 from strongbank.permissions import IsOwnerOrReadOnly, IsUpdateProfile
-from strongbank.serializers.conta_serializer import ContaSerializer, DepositarSerializer, ExtratoSerializer, SacarSerializer, SaldoSerializer, TransferirSerializer
+from strongbank.serializers.conta_serializer import ContaSerializer, DepositarSerializer, SacarSerializer, SaldoSerializer, TransferirSerializer
+from strongbank.serializers.transacao_serializer import TransacaoSerializer
 
 
 class ContaViewset(viewsets.ModelViewSet):
@@ -75,7 +76,7 @@ class SaldoViewset(viewsets.ViewSet):
 
 
 class ExtratoViewset(viewsets.ViewSet):
-    serializer_class = ExtratoSerializer
+    serializer_class = TransacaoSerializer
     permission_classes = [IsOwnerOrReadOnly]
 
     def create(self, request, *args, **kwargs):
@@ -83,8 +84,9 @@ class ExtratoViewset(viewsets.ViewSet):
         conta = Conta.objects.get(cliente=cliente)
         transacoes = Transacao.objects.filter(cliente=cliente).all()
         extrato = conta.extrato(request.data['dta_inicial'], request.data['dta_final'], list(transacoes))
-        # serializer = [ExtratoSerializer(x) for x in extrato]
-        return Response(extrato, status=200)
+        # extrato = [TransacaoSerializer(t) for t in extrato]
+        serializer = TransacaoSerializer(extrato, many=True)
+        return Response(serializer.data, status=200)
 
 
 class DepositarViewset(viewsets.ViewSet):

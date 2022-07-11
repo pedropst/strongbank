@@ -19,7 +19,7 @@ div.css-1inwz65.e88czh80{
 .scene{
   position: relative;
   left:80px;
-  width: 500px;
+  width: 450px;
   height: 200px;
   /* border: 1px solid #CCC; */
   /* margin: 30px; */
@@ -27,7 +27,7 @@ div.css-1inwz65.e88czh80{
 }
 
 .cube {
-  width: 500px;
+  width: 450px;
   height: 200px;
   /* position: relative; */
   transform-style: preserve-3d;
@@ -35,11 +35,20 @@ div.css-1inwz65.e88czh80{
   transition: transform 1s;
 }
 
+.bright{
+  width: 300px;
+  height: 300px;
+  border: #ffffff;
+  position: absolute;
+  top: 500px;
+  box-shadow: 120px 80px 40px 20px #0ff;
+}
+
 .cube__face {
   position: absolute;
   width: 500px;
   height: 200px;
-  border: 5px solid #01311f ;
+  border: 5px solid linear-gradient(60deg, #2B2E4A 0%, #2B2E4A 30%, rgb(255, 75, 75) calc(30% + 1px), rgb(255, 75, 75) 60%, #903749 calc(60% + 1px), #903749 70%, #53354A calc(70% + 1px), #53354A 100%); ;
   /* line-height: 200px; */
   font-size: 40px;
   font-weight: bold;
@@ -48,9 +57,9 @@ div.css-1inwz65.e88czh80{
   border-radius: 10px;
 }
 
-.cube__face--front  { background: #04AA6D }
-.cube__face--right  { background: #01311f }
-.cube__face--back   { background: hsla(120, 100%, 50%, 1); }
+.cube__face--front  { background: linear-gradient(60deg, #2B2E4A 0%, #2B2E4A 30%, #E84545 calc(30% + 1px), #E84545 60%, #903749 calc(60% + 1px), #903749 70%, #53354A calc(70% + 1px), #53354A 100%); }
+.cube__face--right  { background: #ffffff}
+.cube__face--back   { background: #c3c7e0}
 .cube__face--left   { background: hsla(180, 100%, 50%, 1); }
 .cube__face--top    { background: hsla(240, 100%, 50%, 1); }
 .cube__face--bottom { background: #01311f  }
@@ -61,3 +70,12 @@ div.css-1inwz65.e88czh80{
 .cube__face--left   { visibility: hidden; width:25px; transform: rotateX(20deg) rotateY(-90deg) translateX(75px) translateZ(20px); }
 .cube__face--top    { height:25px; transform: rotateX( 110deg) translateY(35px) translateZ(33px); }
 .cube__face--bottom { width:505px; height:25px; transform: rotateX(-70deg) translateY(-35px) translateZ(163px);}
+
+
+div.css-ocqkz7.e1tzin5v4{
+  background-color: rgba(137 162 199 / 32%); 
+  border-radius: 12px; 
+  width: 100%;
+  padding: 20px; 
+  border: 1px solid rgba(250, 250, 250, 0.2);
+}

@@ -45,9 +45,9 @@ class AcoesConta():
         transacoes_filtradas = [x for x in transacoes if (x.dta_criacao >= data_inicial and x.dta_criacao <= data_final)]
         extrato_gerado = {}
         tradutor = {'S':'SAQUE', 'D':'DEPÓSITO', 'T':'TRANSFERÊNCIA', 'TE':'TRANSFERÊNCIA EFETUADA', 'TR':'TRANSFERÊNCIA RECEBIDA', 'PC':'PAGAMENTO POR CARTÃO'}
-        for i, x in enumerate(transacoes_filtradas):
-            extrato_gerado[i] = f'{x.dta_criacao.strftime(r"%d/%m/%Y")}: {tradutor[x.tipo]}, no valor de R${x.valor:.2f}'
-        return extrato_gerado
+        # for i, x in enumerate(transacoes_filtradas):
+        #     extrato_gerado[i] = f'{x.dta_criacao.strftime(r"%d/%m/%Y")}: {tradutor[x.tipo]}, no valor de R${x.valor:.2f}'
+        return transacoes_filtradas
 
 
     def pagar_boleto(self, codigo: str) -> None:

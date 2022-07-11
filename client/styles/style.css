@@ -1,5 +1,21 @@
+html, body, [class*="css"] {
+    font-family: 'Urbanist', sans-serif;
+}
+
+img.css-1v0mbdj.etr89bj1{
+    display: flex;
+    justify-content: center;
+}
+
 div.css-fg4pbf{
     background-color: #04AA6D;
+}
+
+div.css-1n76uvr.e1tzin5v0{
+    background-color: rgba(0, 0, 0, 0.28);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
 }
 
 div.css-1n76uvr.e1tzin5v0{
@@ -14,6 +30,8 @@ div.css-1n76uvr.e1tzin5v0{
 section.main.css-1v3fvcr.egzxvld3{
     background: linear-gradient(320.54deg, #00069F 0%, #120010 72.37%), linear-gradient(58.72deg, #69D200 0%, #970091 100%), linear-gradient(121.28deg, #8CFF18 0%, #6C0075 100%), linear-gradient(121.28deg, #8000FF 0%, #000000 100%), linear-gradient(180deg, #00FF19 0%, #24FF00 0.01%, #2400FF 100%), linear-gradient(52.23deg, #0500FF 0%, #FF0000 100%), linear-gradient(121.28deg, #32003A 0%, #FF4040 100%), radial-gradient(50% 72.12% at 50% 50%, #EB00FF 0%, #110055 100%);
     background-blend-mode: screen, color-dodge, color-burn, screen, overlay, difference, color-dodge, normal;
+    /* background: linear-gradient(320.54deg, #00069F 0%, #120010 72.37%), linear-gradient(58.72deg, #69D200 0%, #970091 100%), linear-gradient(121.28deg, #8CFF18 0%, #6C0075 100%), linear-gradient(121.28deg, #8000FF 0%, #000000 100%), linear-gradient(52.23deg, #0500FF 0%, #FF0000 100%), linear-gradient(121.28deg, #32003A 0%, #FF4040 100%), radial-gradient(50% 72.12% at 50% 50%, #EB00FF 0%, #110055 100%);
+    background-blend-mode: screen, color-dodge, color-burn, screen, difference, color-dodge, normal; */
     /* background: linear-gradient(120deg, #FF0000 0%, #2400FF 100%), linear-gradient(120deg, #FA00FF 0%, #208200 100%), linear-gradient(130deg, #00F0FF 0%, #000000 100%), radial-gradient(110% 140% at 15% 90%, #ffffff 0%, #1700A4 100%), radial-gradient(100% 100% at 50% 0%, #AD00FF 0%, #00FFE0 100%), radial-gradient(100% 100% at 50% 0%, #00FFE0 0%, #7300A9 80%), linear-gradient(30deg, #7ca304 0%, #2200AA 100%);
     background-blend-mode: overlay, color, overlay, difference, color-dodge, difference, normal; */
     /* background: linear-gradient(238.72deg, #FFB864 0%, #006C4C 100%), radial-gradient(100% 224.43% at 0% 0%, #6CFF72 0%, #002C6D 100%), linear-gradient(121.28deg, #FFEAB6 0%, #00563C 100%), radial-gradient(56.26% 101.79% at 50% 0%, #8F00FF 0%, #000000 100%), linear-gradient(65.05deg, #6F0072 0%, #DBFFE5 100%);
@@ -23,7 +41,8 @@ section.main.css-1v3fvcr.egzxvld3{
 div.css-1p05t8e.epcbefy1{
     border-radius: 12px;
     padding: 20px;
-    background-color: rgba(123, 210, 178, 0.32);
+    /* background-color: rgba(123, 210, 178, 0.32); */
+    background-color: rgb(137 162 199 / 32%);
 }
 
 div.element-container.css-gbnw8u.e1tzin5v3{
@@ -74,6 +93,7 @@ input.st-bb.st-bw.st-bx.st-by.st-bz.st-c0.st-c1.st-c2.st-c3.st-c4.st-c5.st-b7.st
 
 div.StyledThumbValue.css-10y5sf6.e88czh82{
     color: white;
+    visibility: hidden;
 }
 
 
@@ -111,14 +131,14 @@ button.st-b4.st-ch.st-c3.st-c4.st-c1.st-c2.st-ci.st-cj.st-ck.st-c5.st-bv{
 
 button.css-1q8dd3e.edgvbvh5{
     background-color: white;
-    color: #3D6C50;
+    color: #090127;
     font-weight: bold;
     margin: auto 40%;
 }
 
 input.botao_voltar{
     background-color: white;
-    color: #3D6C50;
+    color: #090127;
     font-weight: bold;
     font-size: 16px;
     border-radius: 6px;
@@ -129,4 +149,13 @@ input.botao_voltar{
 
 div.element-container.css-gbnw8u.e1tzin5v3{
     margin-top: 25px;
+}
+
+
+/* div.sc-iqcoie.kYuDYD.stDataFrame{
+    width: 94%;
+} */
+
+div.stDataFrame{
+    width: 94%;
 }

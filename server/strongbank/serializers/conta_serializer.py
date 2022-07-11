@@ -35,7 +35,3 @@ class SaldoSerializer(serializers.Serializer):
         fields = ['documento']
 
 
-class ExtratoSerializer(serializers.Serializer):
-    class Meta:
-        fields = ['data_inicial', 'data_final']
-
