@@ -38,6 +38,6 @@ def deposit_page():
     home_button_html = "<a target='_self' href='http://localhost:8501/home'><input type=button value='Voltar' class='botao_voltar'></a>"
     st.markdown(home_button_html, unsafe_allow_html=True)
 
-# st.image(RF"client\resources\images\logo.png")
+
 deposit_page()
 

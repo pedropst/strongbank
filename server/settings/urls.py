@@ -1,13 +1,15 @@
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
+from strongbank.views.user_viewset import UserViewset
 from strongbank.views.cliente_viewset import ClienteViewset
 from strongbank.views.conta_viewset import ContaViewset, DepositarViewset, ExtratoViewset, SacarViewset, TransferirViewset, SaldoViewset
-from strongbank.views.user_viewset import UserCreate, UserDetail, UserList
+# from strongbank.views.user_viewset import UserCreate, UserDetail, UserList
 from strongbank.views.cartao_viewset import CartaoViewset, PagarCreditoViewset, PagarDebitoViewset
 from strongbank.views.fatura_viewset import FaturaViewset
 
 router = routers.DefaultRouter()
+router.register(r'user', UserViewset, basename='User')
 router.register(r'cliente', ClienteViewset, basename='Cliente')
 router.register(r'conta', ContaViewset, basename='Conta')
 router.register(r'sacar', SacarViewset, basename='Sacar')
@@ -26,9 +28,9 @@ urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('users/', UserList.as_view()),
-    path('usercreate/', UserCreate.as_view()),
-    path('users/<int:pk>/', UserDetail.as_view()),
+    # path('users/', UserList.as_view()),
+    # path('usercreate/', UserCreate.as_view()),
+    # path('users/<int:pk>/', UserDetail.as_view()),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 

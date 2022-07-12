@@ -37,6 +37,5 @@ def login_page():
     st.markdown(new_account_html, unsafe_allow_html=True)
 
 
-# st.image(RF"client\resources\images\logo.png")
 login_page()
 

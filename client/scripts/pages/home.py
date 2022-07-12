@@ -8,7 +8,7 @@ from helpers import html_to_fstring
 
 st.set_page_config(page_title="STRONG BANK - Home", initial_sidebar_state="collapsed")
 
-def home_page_novo():
+def home_page():
     with open('client/styles/style.css', 'r') as f:
         css_to_inject = f.read()
         st.markdown(f'<style>{css_to_inject}</style>', unsafe_allow_html=True)
@@ -23,8 +23,5 @@ def home_page_novo():
     st.markdown(home_button_html, unsafe_allow_html=True)
 
 
-# st.image(RF"client\resources\images\logo.png")
-home_page_novo()
-
-
+home_page()
 

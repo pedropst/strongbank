@@ -45,6 +45,5 @@ def statement_page():
     st.markdown(home_button_html, unsafe_allow_html=True)
 
     
-# st.image(RF"client\resources\images\logo.png")
 statement_page()
 

@@ -14,7 +14,7 @@ class CartaoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cartao
-        fields = ['nome', 'numeracao', 'mes_validade', 'ano_validade', 'cvv', 'limite_total', 'limite_desbloqueado']
+        fields = ['id', 'nome', 'numeracao', 'mes_validade', 'ano_validade', 'cvv', 'limite_total', 'limite_desbloqueado', 'bloqueado']
 
 
 class PagarCreditoSerializer(serializers.Serializer):

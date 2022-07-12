@@ -84,7 +84,6 @@ class ExtratoViewset(viewsets.ViewSet):
         conta = Conta.objects.get(cliente=cliente)
         transacoes = Transacao.objects.filter(cliente=cliente).all()
         extrato = conta.extrato(request.data['dta_inicial'], request.data['dta_final'], list(transacoes))
-        # extrato = [TransacaoSerializer(t) for t in extrato]
         serializer = TransacaoSerializer(extrato, many=True)
         return Response(serializer.data, status=200)
 
