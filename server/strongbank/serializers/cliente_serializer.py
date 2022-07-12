@@ -32,9 +32,9 @@ class ClienteSerializer(serializers.ModelSerializer):
             Verifica se os campos de CPF e CNPJ foram preenchidos conforme a quantidade de caracteres esperadas.
         """
         if (data.get('tipo') == "PF") and (len(data.get('documento')) != 11):
-            raise serializers.ValidationError({'Erro':'Espera-se um CNPJ para um cliente PF.'})
+            raise serializers.ValidationError({'Erro':'Espera-se um CPF válido para um cliente PF.'})
         elif (data.get('tipo') == "PJ") and (len(data.get('documento')) != 14):
-            raise serializers.ValidationError({'Erro':'Espera-se um CNPJ para um cliente PJ.'})
+            raise serializers.ValidationError({'Erro':'Espera-se um CNPJ válido para um cliente PJ.'})
 
     def validate_celular(self, celular: str) -> None:
         """

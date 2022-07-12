@@ -37,12 +37,12 @@ class ContaViewset(viewsets.ModelViewSet):
         return Response(serializer.data, status=201)
 
     def list(self, request, *args, **kwargs):
-        cliente = Cliente.objects.get(dono=request.user)
-        queryset = Conta.objects.get(cliente=cliente)
         if request.user.is_superuser:
             queryset = Conta.objects.all()
             serializer = ContaSerializer(queryset, many=True)
         else:
+            cliente = Cliente.objects.get(dono=request.user)
+            queryset = Conta.objects.get(cliente=cliente)
             serializer = ContaSerializer(queryset)
         return Response(serializer.data, status=200)
 
