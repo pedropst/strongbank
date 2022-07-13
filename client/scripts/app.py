@@ -1,4 +1,4 @@
-from pages.home import home_page
+from pages.login import login_page
 
 import streamlit as st
 

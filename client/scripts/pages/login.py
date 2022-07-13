@@ -1,6 +1,7 @@
 import json
 import streamlit as st
 import requests
+from essentials import get_account_info
 
 from helpers import html_to_fstring
 
@@ -24,16 +25,20 @@ def login_page():
 
     if username and password and submit:
         data = {
-                "conta_logada": username,
-                "senha_logada": password
+                "username": username,
+                "password": password
                 }
         with open('client/cookie.json', 'w') as f:
             json.dump(data, f)
 
-        st.markdown("<a target='_self' href='http://localhost:8501/home'><input type=button value='Avançar'></a>", unsafe_allow_html=True)
-        # r = requests.post(url='http://127.0.0.1:8000/transferir/', json=data, auth=get_account_info())
+        response = requests.post(url='http://127.0.0.1:8000/login/', json=data, auth=get_account_info())
 
-    new_account_html = '<a target="_self" href="http://localhost:8501/criar_login" style="color:#000000; font-weight:1000; padding:20px">Criar uma nova conta</a>'
+        if response.status_code == 200:
+            st.markdown("<a target='_self' href='http://localhost:8501/home' class='botao_voltar' style='position:absolute; right:50px'><input type=button value='Avançar'></a>", unsafe_allow_html=True)
+        else:
+            st.write(response.json())
+
+    new_account_html = '<a target="_self" href="http://localhost:8501/criar_login" style="color:#FFFFFF; font-weight:1000; padding:20px">Criar uma nova conta</a>'
     st.markdown(new_account_html, unsafe_allow_html=True)
 
 

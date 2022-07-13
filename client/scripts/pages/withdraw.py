@@ -31,11 +31,14 @@ def withdraw_page():
     st.markdown(html_to_inject, unsafe_allow_html=True)
 
     if value and password and submit:
-        data = {"valor": float(value)}
-        requests.post(url='http://127.0.0.1:8000/sacar/', json=data, auth=get_account_info())
+        data = {"valor": float(value), "senha":password}
+        response = requests.post(url='http://127.0.0.1:8000/sacar/', json=data, auth=get_account_info())
 
-        st.legacy_caching.clear_cache()
-        st.experimental_rerun()
+        if response.status_code == 200:
+            st.legacy_caching.clear_cache()
+            st.experimental_rerun()
+        else:
+            st.write(response.json())
 
     home_button_html = "<a target='_self' href='http://localhost:8501/home'><input type=button value='Voltar' class='botao_voltar'></a>"
     st.markdown(home_button_html, unsafe_allow_html=True)

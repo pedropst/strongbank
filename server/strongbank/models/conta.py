@@ -32,11 +32,11 @@ class Conta(AcoesConta, models.Model):
     dados_sensiveis = models.OneToOneField(ContaDadosSensiveis, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=20, choices=conta_tipo, default=conta_tipo[0][0])
 
-    # def save(self, *args, **kwargs):
-    #     todos_numeros = [x.numero for x in list(Conta.objects.all())]
-    #     while self.numero in todos_numeros:
-    #         self.numero = str(randint(10**5, (10**6)-1))
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        todos_numeros = [x.numero for x in list(Conta.objects.all())]
+        while self.numero in todos_numeros:
+            self.numero = str(randint(10**5, (10**6)-1))
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.cliente.nome

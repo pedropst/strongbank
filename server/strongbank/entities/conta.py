@@ -1,8 +1,10 @@
 from datetime import datetime, date
 from decimal import Decimal
 import json
+
 from src.exceptions.saldo_insuficiente_saque_error import SaldoInsuficienteParaSaqueError
 from src.exceptions.saldo_insuficiente_transferencia_error import SaldoInsuficienteParaTransferenciaError
+
 
 class AcoesConta(): 
     @property
@@ -23,7 +25,7 @@ class AcoesConta():
             self.dados_sensiveis.saldo -= quantidade
             self.dados_sensiveis.save()
         else:
-            raise SaldoInsuficienteParaSaqueError('CONTA | Saque não permitido: saldo insuficiente.')
+            raise SaldoInsuficienteParaSaqueError({'ERRO':'Saque não permitido: saldo insuficiente.'})
     
     def depositar(self, quantidade: Decimal) -> None:
         quantidade = Decimal(quantidade)
@@ -36,7 +38,7 @@ class AcoesConta():
             destinatario.depositar(quantidade)
             self.sacar(quantidade)
         else:
-            raise SaldoInsuficienteParaTransferenciaError('CONTA | Transferência não permitida: saldo insuficiente')
+            raise SaldoInsuficienteParaTransferenciaError({'ERRO':'Transferência não permitida: saldo insuficiente'})
 
 
     def extrato(self, dta_inicial: str, dta_final: str, transacoes: list) -> json:
@@ -59,4 +61,5 @@ class AcoesConta():
             self.dados_sensiveis.save()
             return True
         else:
-            raise SaldoInsuficienteParaTransferenciaError('CONTA | Transferência não permitida: saldo insuficiente')
+            raise SaldoInsuficienteParaTransferenciaError({'ERRO': 'Transferência não permitida: saldo insuficiente'})
+

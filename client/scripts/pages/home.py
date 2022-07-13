@@ -1,5 +1,3 @@
-from re import A
-from tkinter import Image
 import streamlit as st
 
 from essentials import get_saldo, get_cliente

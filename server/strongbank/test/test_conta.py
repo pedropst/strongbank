@@ -66,7 +66,7 @@ class ContaTestCase(TestCase):
 
         self.assertNotEqual(conta.numero, "")
 
-    def test_conta_geracao_numero_de_conta_com_len_igual_16(self):
+    def test_conta_geracao_numero_de_conta_com_len_igual_6(self):
         self.client_auth.post('/conta/', payload, format='json')
         conta = Conta.objects.get(cliente=self.cliente)
 

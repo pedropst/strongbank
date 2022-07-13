@@ -1,3 +1,4 @@
+from decimal import Decimal
 from random import randint
 from rest_framework import serializers
 from strongbank.serializers.cliente_serializer import ClienteSerializer
@@ -47,13 +48,39 @@ class ContaDadosSensiveisSerializer(serializers.ModelSerializer):
 
 
 class TransferirSerializer(serializers.Serializer):
+    valor = serializers.DecimalField(max_digits=15, decimal_places=4)
+    senha = serializers.CharField(max_length=300)
+    
     class Meta:
-        fields = ['doc_remetente', 'valor', 'doc_destinatario']
+        fields = ['doc_remetente', 'valor', 'doc_destinatario', 'senha']
+
+    def validate_valor(self, valor):
+        if valor <= 0:
+            raise serializers.ValidationError(('Valor INVÁLIDO.'), code=400)
+        return valor
+
+    def validate_senha(self, senha: str) -> None:
+        if not self.context.user.check_password(senha):
+            raise serializers.ValidationError(('Senha INVÁLIDA.'), code=400)
+        return senha
 
 
 class SacarSerializer(serializers.Serializer):
+    valor = serializers.DecimalField(max_digits=15, decimal_places=4)
+    senha = serializers.CharField(max_length=300)
+    
     class Meta:
-        fields = ['documento', 'valor']
+        fields = ['valor', 'senha']
+
+    def validate_valor(self, valor):
+        if valor <= 0:
+            raise serializers.ValidationError(('Valor INVÁLIDO.'), code=400)
+        return valor
+
+    def validate_senha(self, senha: str) -> None:
+        if not self.context.user.check_password(senha):
+            raise serializers.ValidationError(('Senha INVÁLIDA.'), code=400)
+        return senha
 
 
 class DepositarSerializer(serializers.Serializer):
@@ -64,5 +91,6 @@ class DepositarSerializer(serializers.Serializer):
 class SaldoSerializer(serializers.Serializer):
     class Meta:
         fields = ['documento']
+
 
 

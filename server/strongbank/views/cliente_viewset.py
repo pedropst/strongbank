@@ -11,7 +11,11 @@ class ClienteViewset(viewsets.ModelViewSet):
     queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
 
+    
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request, *args, **kwargs):
         novo_cliente = Cliente.objects.create(nome=request.data['nome'], 

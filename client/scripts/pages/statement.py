@@ -29,11 +29,16 @@ def statement_page():
         data = {"dta_inicial": data_inicial.strftime(r'%d/%m/%Y'),
                 "dta_final": data_final.strftime(r'%d/%m/%Y')}  
         response = requests.post(url='http://127.0.0.1:8000/extrato/', json=data, auth=get_account_info())
-        df = pd.DataFrame(response.json())
-        df = df.drop(['id', 'cliente'], axis=1)
-        df = df.rename(columns={'tipo':'TIPO', 'dta_criacao':'DATA', 'valor':'VALOR'})
-        st.dataframe(df, width=5000)
-        st.legacy_caching.clear_cache()
+
+        if response.status_code == 200:
+            df = pd.DataFrame(response.json())
+            df = df.drop(['id', 'cliente'], axis=1)
+            df = df.rename(columns={'tipo':'TIPO', 'dta_criacao':'DATA', 'valor':'VALOR'})
+            st.dataframe(df, width=5000)
+            st.legacy_caching.clear_cache()
+        else:
+            st.write(f'CODE: {response.status_code}')
+            st.write(response.json())
 
     html = """    <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
         <img src='data:image/png;base64,{img_to_bytes()}' style="width: 25%; height: auto;" class="img-fluid">

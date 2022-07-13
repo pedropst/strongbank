@@ -10,7 +10,6 @@ from strongbank.permissions import IsOwnerOrReadOnly, IsUpdateProfile
 from strongbank.serializers.conta_serializer import ContaSerializer, DepositarSerializer, SacarSerializer, SaldoSerializer, TransferirSerializer
 from strongbank.serializers.transacao_serializer import TransacaoSerializer
 
-
 class ContaViewset(viewsets.ModelViewSet):
     serializer_class = ContaSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -56,12 +55,16 @@ class SacarViewset(viewsets.ViewSet):
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
 
-        conta.sacar(request.data['valor'])
-        nova_transacao = Transacao.objects.create(tipo='S',
-                                                  cliente = cliente,
-                                                  valor = request.data['valor'])
-        nova_transacao.save()
-        return Response({'status': 'Saque efetuado com sucesso!'}, status=200)
+        serializer = SacarSerializer(data=request.data, context=request)
+        serializer.is_valid(raise_exception=True)
+        if request.user.check_password(request.data['senha']):
+            conta.sacar(request.data['valor'])
+            nova_transacao = Transacao.objects.create(tipo='S',
+                                                    cliente = cliente,
+                                                    valor = request.data['valor'])
+            nova_transacao.save()
+            return Response({'status': 'Saque efetuado com sucesso!'}, status=200)
+
 
 
 class SaldoViewset(viewsets.ViewSet):
@@ -72,7 +75,7 @@ class SaldoViewset(viewsets.ViewSet):
         # cliente = Cliente.objects.get(documento=request.data['documento'])
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
-        return Response({'Seu saldo é: ': conta.saldo}, status=200)
+        return Response(conta.saldo, status=200)
 
 
 class ExtratoViewset(viewsets.ViewSet):
@@ -113,15 +116,16 @@ class TransferirViewset(viewsets.ViewSet):
 
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request):
-        # cliente = Cliente.objects.get(dono=request.user)
         cliente_remetente = Cliente.objects.get(dono=request.user)
-        # cliente_remetente = Cliente.objects.get(documento=request.data['doc_remetente'])
         conta_remetente = Conta.objects.get(cliente=cliente_remetente)
 
         cliente_destinatario = Cliente.objects.get(documento=request.data['doc_destinatario'])
         conta_destinatario = Conta.objects.get(cliente=cliente_destinatario, 
                                                numero=request.data['numero'],
                                                agencia=request.data['agencia'])
+
+        serializer = TransferirSerializer(data=request.data, context=request)
+        serializer.is_valid(raise_exception=True)
 
         conta_remetente.transferir(request.data['valor'], conta_destinatario)
         nova_transacao = Transacao.objects.create(tipo='TE',
