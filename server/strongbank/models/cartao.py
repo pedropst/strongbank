@@ -17,7 +17,7 @@ class CartaoDadosSensiveis(models.Model):
 
 class Cartao(CartaoCreditoEDebito, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    conta = models.ForeignKey(Conta, on_delete=models.CASCADE)
+    conta = models.OneToOneField(Conta, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=20, choices=[('0', 'Credito'), 
                        ('1', 'Debito'), ('2', 'Credito e Debito')], 
                        default=1)
@@ -29,9 +29,9 @@ class Cartao(CartaoCreditoEDebito, models.Model):
     dta_criacao = models.DateField(auto_now=True)
     numeracao = models.CharField(max_length=16, editable=False)
     dados_sensiveis = models.OneToOneField(CartaoDadosSensiveis, on_delete=models.CASCADE)
-    limite_total = models.DecimalField(max_digits=15, decimal_places=5, default=Decimal(0))
-    limite_disponivel = models.DecimalField(max_digits=15, decimal_places=5, default=Decimal(0))
-    limite_desbloqueado = models.DecimalField(max_digits=15, decimal_places=5, default=Decimal(0))
+    limite_total = models.DecimalField(max_digits=15, decimal_places=4, default=Decimal(0))
+    limite_disponivel = models.DecimalField(max_digits=15, decimal_places=4, default=Decimal(0))
+    limite_desbloqueado = models.DecimalField(max_digits=15, decimal_places=4, default=Decimal(0))
     bandeira = models.CharField(max_length=20)
     
     def __str__(self) -> str:

@@ -1,10 +1,13 @@
 from decimal import Decimal
 from random import randint
 from rest_framework import serializers
-from strongbank.serializers.cliente_serializer import ClienteSerializer
-from strongbank.models.cliente import Cliente
 
+from strongbank.models.cliente import Cliente
 from strongbank.models.conta import Conta, ContaDadosSensiveis
+from strongbank.models.transacao import Transacao
+from strongbank.serializers.cliente_serializer import ClienteSerializer
+from strongbank.serializers.transacao_serializer import TransacaoSerializer
+
 
 """
 "Each field in a Form class is responsible not only for validating data, 
@@ -16,6 +19,7 @@ Mas como estamos usando DRF, em 'Form' lê-se 'Serializer'.
 
 https://www.django-rest-framework.org/api-guide/fields/
 """
+
 
 class ContaSerializer(serializers.ModelSerializer):
     conta_tipo = [('P', 'Poupança'), ('C', 'Corrente')]
@@ -91,6 +95,4 @@ class DepositarSerializer(serializers.Serializer):
 class SaldoSerializer(serializers.Serializer):
     class Meta:
         fields = ['documento']
-
-
-
+    

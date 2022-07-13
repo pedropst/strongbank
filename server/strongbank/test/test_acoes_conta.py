@@ -123,10 +123,15 @@ class AcoesContaTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
     
-    def test_retonar_diminuir_saldo_quando_sacado(self):
+    def test_diminuir_saldo_quando_sacado(self):
         self.client_auth.post('/sacar/', {'valor':500, 'senha':123456}, format='json')
 
         self.assertEqual(self.conta1.saldo, 4500)
+
+    def test_aumentar_saldo_quando_sacado(self):
+        self.client_auth.post('/depositar/', {'valor':500}, format='json')
+
+        self.assertEqual(self.conta1.saldo, 5500)
 
     def test_retornar_400_quando_sacar_com_senha_errada(self):
         response = self.client_auth.post('/sacar/', {'valor':500, 'senha':153287}, format='json')
@@ -138,10 +143,29 @@ class AcoesContaTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
     
-    def test_retonar_aumentar_saldo_quando_sacado(self):
-        self.client_auth.post('/depositar/', {'valor':500}, format='json')
+    def test_retonar_200_quando_tirar_extrato(self):
+        response = self.client_auth.post('/extrato/', {"dta_inicial":"09/07/2022", "dta_final":"13/07/2022"}, format='json')
 
-        self.assertEqual(self.conta1.saldo, 5500)
+        self.assertEqual(response.status_code, 200)
+    
+    def test_retonar_vazio_quando_tirar_extrato_sem_transacoes_previas(self):
+        response = self.client_auth.post('/extrato/', {"dta_inicial":"09/07/2022", "dta_final":"13/07/2022"}, format='json')
+
+        self.assertEqual(response.json(), [])
+    
+    def test_retonar_transacao_quando_tirar_extrato_com_transacao_previa(self):
+        self.client_auth.post('/sacar/', {'valor':500, 'senha':123456}, format='json')
+        response = self.client_auth.post('/extrato/', {"dta_inicial":"09/07/2022", "dta_final":"13/07/2022"}, format='json')
+
+        self.assertEqual(len(response.json()), 1)
+    
+    def test_retonar_transacoes_quando_tirar_extrato_com_transacoes_previas(self):
+        self.client_auth.post('/sacar/', {'valor':500, 'senha':123456}, format='json')
+        self.client_auth.post('/depositar/', {'valor':500}, format='json')
+        response = self.client_auth.post('/extrato/', {"dta_inicial":"09/07/2022", "dta_final":"13/07/2022"}, format='json')
+
+        self.assertEqual(len(response.json()), 2)
+
 
         
 

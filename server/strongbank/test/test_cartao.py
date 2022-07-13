@@ -39,4 +39,34 @@ class CartaoTestCase(TestCase):
             Cartao.objects.get(conta=self.conta)
 
     def test_cartao_criacao(self):
-        Cartao.objects.create(conta=self.conta, dados_sensiveis=self.dados, tipo='2', dia_vencimento=15)
+        cartao = Cartao.objects.create(conta=self.conta, dados_sensiveis=self.dados, tipo='2', dia_vencimento=15)
+
+        self.assertEqual(type(cartao), Cartao)
+
+    def test_cartao_criacao_por_requisicao(self):
+        response = self.client_auth.post('/cartao/', {"dia_vencimento": "10", "tipo":"1", "limite_total":"1000"}, format='json')
+
+        self.assertEqual(response.status_code, 201)
+
+    def test_cartao_criacao_por_requisicao_com_payload_incorreto(self):
+        response = self.client_auth.post('/cartao/', {"dia_vencimento": "10", "tipo":"1"}, format='json')
+
+        self.assertEqual(response.status_code, 400)
+        
+    def test_cartao_criacao_dois_cartoes_pelo_mesmo_cliente(self):
+        self.client_auth.post('/cartao/', {"dia_vencimento": "10", "tipo":"1", "limite_total":"1000"}, format='json')
+
+        with self.assertRaises(IntegrityError):
+            self.client_auth.post('/cartao/', {"dia_vencimento": "10", "tipo":"1", "limite_total":"1000"}, format='json')
+    
+    def test_cartao_verificar_limite_disponivel(self):
+        self.client_auth.post('/cartao/', {"dia_vencimento": "10", "tipo":"1", "limite_total":"1000"}, format='json')
+        cartao = Cartao.objects.get(conta=self.conta)
+
+        self.assertEqual(cartao.limite_disponivel, 1000)
+    
+    def test_cartao_verificar_limite_desbloqueado(self):
+        self.client_auth.post('/cartao/', {"dia_vencimento": "10", "tipo":"1", "limite_total":"1000"}, format='json')
+        cartao = Cartao.objects.get(conta=self.conta)
+
+        self.assertEqual(cartao.limite_desbloqueado, 800)

@@ -104,17 +104,17 @@ class CartaoViewset(viewsets.ModelViewSet):
         cartoes = Cartao.objects.all()
         return cartoes
 
-    def partial_update(self, request, *args, **kwargs):
-        if request.user.is_superuser:
-            pass # ERROR SUPER USER NOT SUPPOSE TO CHANGE CARD INFO
-        else:
-            cliente = Cliente.objects.get(dono=request.user)
-            conta = Conta.objects.get(cliente=cliente)
-            cartao = Cartao.objects.get(conta=conta)
-            cartao.bloqueado = True if request.data['bloqueado'] == 1 else False
-            cartao.limite_desbloqueado = request.data['limite_desbloqueado'] if request.data['limite_desbloqueado'] < cartao.limite_disponivel else cartao.limite_desbloqueado
-            cartao.save()
-        return Response({"status":"Cartão bloqueado com sucesso!"}, status=200)
+    # def partial_update(self, request, *args, **kwargs):
+    #     if request.user.is_superuser:
+    #         pass # ERROR SUPER USER NOT SUPPOSE TO CHANGE CARD INFO
+    #     else:
+    #         cliente = Cliente.objects.get(dono=request.user)
+    #         conta = Conta.objects.get(cliente=cliente)
+    #         cartao = Cartao.objects.get(conta=conta)
+    #         cartao.bloqueado = True if request.data['bloqueado'] == 1 else False
+    #         cartao.limite_desbloqueado = request.data['limite_desbloqueado'] if request.data['limite_desbloqueado'] < cartao.limite_disponivel else cartao.limite_desbloqueado
+    #         cartao.save()
+    #     return Response({"status":"Cartão bloqueado com sucesso!"}, status=200)
 
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request, *args, **kwargs):
@@ -144,15 +144,32 @@ class CartaoViewset(viewsets.ModelViewSet):
         while numeracao in todos_numeros :
             numeracao = '5431' + str(randint(10**11, (10**12)-1))
 
+        if 'dia_vencimento' not in (request.data.keys()):
+            raise serializers.ValidationError({'ERRO':'O "dia_vencimento" não informado.'}, code=400)
+        elif 'tipo' not in (request.data.keys()):
+            raise serializers.ValidationError({'ERRO':'O "tipo" não informado.'}, code=400)
+        elif 'limite_total' not in (request.data.keys()):
+            raise serializers.ValidationError({'ERRO':'O "limite_total" não informado.'}, code=400)
+
         novo_cartao = Cartao.objects.create(conta=conta,
                                             dia_vencimento=request.data['dia_vencimento'], 
                                             tipo=request.data['tipo'],
                                             dados_sensiveis=dados,
                                             nome=nome,
                                             numeracao=numeracao,
-                                            limite_total=5000,
-                                            limite_desbloqueado=3000,
-                                            limite_disponivel=5000)
+                                            limite_total=Decimal(request.data['limite_total']),
+                                            limite_desbloqueado=Decimal(request.data['limite_total'])*Decimal(0.8),
+                                            limite_disponivel=Decimal(request.data['limite_total']))
+        request.data['dados_sensiveis'] = dados
+        request.data['nome'] = nome
+        request.data['numeracao'] = numeracao
+        request.data['limite_total'] = Decimal(request.data['limite_total'])
+        request.data['limite_desbloqueado'] = Decimal(request.data['limite_total'])*Decimal(0.8)
+        request.data['limite_desbloqueado'] = Decimal(request.data['limite_total'])
+
+        serializer = CartaoSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
         novo_cartao.save()
 
         serializer = CartaoSerializer(novo_cartao)
