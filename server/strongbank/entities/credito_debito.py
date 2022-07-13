@@ -45,7 +45,8 @@ class CartaoCreditoEDebito():
     def tipo(self):
         return self.__tipo
 
-    def pagar_debito(self, valor: Decimal, conta: AcoesConta):
+    def pagar_debito(self, valor: float, conta: AcoesConta):
+        valor = Decimal(valor)
         try:
             conta.usar_cartao(valor)
             return True

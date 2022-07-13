@@ -1,7 +1,8 @@
 from datetime import datetime
 from decimal import Decimal
-from django.db import models
+from typing import Any
 from uuid import uuid4
+from django.db import models
 
 from strongbank.entities.credito_debito import CartaoCreditoEDebito
 from strongbank.models.conta import Conta
@@ -18,9 +19,6 @@ class CartaoDadosSensiveis(models.Model):
 class Cartao(CartaoCreditoEDebito, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     conta = models.OneToOneField(Conta, on_delete=models.CASCADE)
-    tipo = models.CharField(max_length=20, choices=[('0', 'Credito'), 
-                       ('1', 'Debito'), ('2', 'Credito e Debito')], 
-                       default=1)
     dia_vencimento = models.IntegerField(choices=[(x+1, f'Dia {x+1}') for x in range(28)])
     nome = models.CharField(max_length=30, editable=False, default='')
     mes_validade = models.CharField(max_length=2, editable=False, default=str(datetime.today().month))
@@ -34,6 +32,6 @@ class Cartao(CartaoCreditoEDebito, models.Model):
     limite_desbloqueado = models.DecimalField(max_digits=15, decimal_places=4, default=Decimal(0))
     bandeira = models.CharField(max_length=20)
     
-    def __str__(self) -> str:
+    def __str__(self) -> Any:
         return self.nome
 

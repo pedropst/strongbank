@@ -25,8 +25,11 @@ class PagarCreditoViewset(viewsets.ViewSet):
     def create(self, request):
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
-        cartao = Cartao.objects.filter(conta=conta).all().get(numeracao=request.data['numeracao'])
+        cartao = Cartao.objects.get(conta=conta)
         faturas = Fatura.objects.filter(cartao=cartao).all()
+
+        serializer = PagarCreditoSerializer(data=request.data, context=request)
+        serializer.is_valid(raise_exception=True)
         
         if len(faturas) > 0:
             faturas = sorted(faturas, key=lambda x: datetime(x.ano_ref, x.mes_ref, 1))
@@ -86,8 +89,13 @@ class PagarDebitoViewset(viewsets.ViewSet):
     def create(self, request):
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
-        cartao = Cartao.objects.filter(conta=conta).all().get(numeracao=request.data['numeracao'])
+        cartao = Cartao.objects.get(conta=conta)
 
+        serializer = PagarDebitoSerializer(data=request.data, context=request)
+        serializer.is_valid(raise_exception=True)
+        
+        if len(request.data) != 2:
+            raise serializers.ValidationError({"ERRO":"Payload INVÁLIDO."}, code=400)
         if cartao.pagar_debito(request.data['valor'], conta):
             nova_transacao = Transacao.objects.create(tipo='PC',
                                                       cliente = cliente,
@@ -146,14 +154,11 @@ class CartaoViewset(viewsets.ModelViewSet):
 
         if 'dia_vencimento' not in (request.data.keys()):
             raise serializers.ValidationError({'ERRO':'O "dia_vencimento" não informado.'}, code=400)
-        elif 'tipo' not in (request.data.keys()):
-            raise serializers.ValidationError({'ERRO':'O "tipo" não informado.'}, code=400)
         elif 'limite_total' not in (request.data.keys()):
             raise serializers.ValidationError({'ERRO':'O "limite_total" não informado.'}, code=400)
 
         novo_cartao = Cartao.objects.create(conta=conta,
                                             dia_vencimento=request.data['dia_vencimento'], 
-                                            tipo=request.data['tipo'],
                                             dados_sensiveis=dados,
                                             nome=nome,
                                             numeracao=numeracao,

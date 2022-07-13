@@ -1,4 +1,5 @@
 from decimal import Decimal
+from requests import request
 from rest_framework import serializers
 
 from strongbank.models.cartao import Cartao, CartaoDadosSensiveis
@@ -32,8 +33,43 @@ class PagarCreditoSerializer(serializers.Serializer):
     class Meta:
         fields = ['valor', 'parcelas']
 
+    def validate(self, request):
+        if 'valor' not in (self.context.data.keys()):
+            raise serializers.ValidationError({'ERRO':'O "valor" não informado.'}, code=400)
+        elif 'parcelas' not in (self.context.data.keys()):
+            raise serializers.ValidationError({'ERRO':'O "parcelas" não informado.'}, code=400)
+        elif 'descricao' not in (self.context.data.keys()):
+            raise serializers.ValidationError({'ERRO':'O "descricao" não informado.'}, code=400)
+
+        return super().validate(request)
+
+    def validate_valor(self, valor):
+        if valor <= 0:
+            raise serializers.ValidationError(('Valor INVÁLIDO.'), code=400)
+        return valor
+
+    def validate_parcelas(self, parcelas):
+        if parcelas <= 0:
+            raise serializers.ValidationError(('A quantidade de parcelas precisa ser entre 1 e 12.'), code=400)
+        return parcelas
+
+    
+
 
 class PagarDebitoSerializer(serializers.Serializer):
     class Meta:
         fields = ['valor']
+
+    def validate(self, request):
+        if 'valor' not in (self.context.data.keys()):
+            raise serializers.ValidationError({'ERRO':'O "valor" não informado.'}, code=400)
+        elif 'descricao' not in (self.context.data.keys()):
+            raise serializers.ValidationError({'ERRO':'O "descricao" não informado.'}, code=400)
+
+        return super().validate(request)
+
+    def validate_valor(self, valor):
+        if valor <= 0:
+            raise serializers.ValidationError(('Valor INVÁLIDO.'), code=400)
+        return valor
 
