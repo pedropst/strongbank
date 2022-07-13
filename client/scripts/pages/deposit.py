@@ -22,7 +22,7 @@ def deposit_page():
         description = st.text_input('Descrição:')
         submit = st.form_submit_button(label='Confirmar')
 
-    html = """    <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
+    html = """    <div style="display: flex; justify-content: center; align-items: center; margin: 20px;">
         <img src='data:image/png;base64,{img_to_bytes()}' style="width: 25%; height: auto;" class="img-fluid">
     </div>"""
     html_to_inject = html_to_fstring(html)

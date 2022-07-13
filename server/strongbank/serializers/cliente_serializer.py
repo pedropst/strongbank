@@ -7,7 +7,7 @@ class ClienteSerializer(serializers.ModelSerializer):
     nome = serializers.CharField(max_length=80)
     endereco = serializers.CharField(max_length=100)
     celular = serializers.CharField(max_length=13)
-    documento = serializers.CharField(min_length=9, max_length=14)
+    documento = serializers.CharField(max_length=14)
     tipo = serializers.CharField(max_length=2)
 
     class Meta:

@@ -26,14 +26,8 @@ class ClienteViewset(viewsets.ModelViewSet):
 
         request.data['documento'] = request.data['cpf'] if request.data['tipo'] == 'PF' else request.data['cnpj']
         serializer = ClienteSerializer(data=request.data)
-
-        if serializer.is_valid(raise_exception=True):
-            novo_cliente.save()
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-        # serializer = ClienteSerializer(novo_cliente)
+        serializer.is_valid(raise_exception=True)
+        novo_cliente.save()
 
         return Response(serializer.data, status=201)
 

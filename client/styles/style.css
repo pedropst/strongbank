@@ -153,10 +153,14 @@ div.element-container.css-gbnw8u.e1tzin5v3{
 }
 
 
-/* div.sc-iqcoie.kYuDYD.stDataFrame{
-    width: 94%;
-} */
-
 div.stDataFrame{
     width: 94%;
+}
+
+div.element-container.css-1hynsf2.e1tzin5v3{
+    width:auto
+}
+
+div.element-container.css-1hynsf2.e1tzin5v3>div:not(.stMarkdown){
+    width:auto !important
 }

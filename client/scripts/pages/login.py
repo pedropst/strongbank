@@ -1,7 +1,7 @@
 import json
 import streamlit as st
 import requests
-from essentials import get_account_info
+from essentials import get_account_info, get_cliente
 
 from helpers import html_to_fstring
 
@@ -34,11 +34,23 @@ def login_page():
         response = requests.post(url='http://127.0.0.1:8000/login/', json=data, auth=get_account_info())
 
         if response.status_code == 200:
-            st.markdown("<a target='_self' href='http://localhost:8501/home' class='botao_voltar' style='position:absolute; right:50px'><input type=button value='Avançar'></a>", unsafe_allow_html=True)
+            try:
+                get_cliente()
+                st.markdown("<a target='_self' href='http://localhost:8501/home' class='botao_voltar' style='position:absolute; right:50px'><input type=button value='Avançar'></a>", unsafe_allow_html=True)
+            except requests.JSONDecodeError:
+                st.markdown("<a target='_self' href='http://localhost:8501/customer' class='botao_voltar' style='position:absolute; right:50px'><input type=button value='Avançar'></a>", unsafe_allow_html=True)
+
         else:
             st.write(response.json())
 
-    new_account_html = '<a target="_self" href="http://localhost:8501/criar_login" style="color:#FFFFFF; font-weight:1000; padding:20px">Criar uma nova conta</a>'
+    html = """    <div style="display: flex; justify-content: center; align-items: center; margin: 20px;">
+        <img src='data:image/png;base64,{img_to_bytes()}' style="width: 25%; height: auto;" class="img-fluid">
+    </div>"""
+    html_to_inject = html_to_fstring(html)
+
+    st.markdown(html_to_inject, unsafe_allow_html=True)
+
+    new_account_html = '<a target="_self" href="http://localhost:8501/register" style="color:#FFFFFF; font-weight:1000; padding:20px">Criar uma nova conta</a>'
     st.markdown(new_account_html, unsafe_allow_html=True)
 
 

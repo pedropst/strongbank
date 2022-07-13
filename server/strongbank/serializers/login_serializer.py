@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(min_length=6, max_length=20)
+    username = serializers.CharField(max_length=20)
     password = serializers.CharField(min_length=6, max_length=20)
 
     class Meta:
