@@ -8,7 +8,8 @@ from strongbank.models.cliente import Cliente
 from strongbank.models.conta import Conta, ContaDadosSensiveis
 from strongbank.models.transacao import Transacao
 from strongbank.permissions import IsOwnerOrReadOnly, IsUpdateProfile
-from strongbank.serializers.conta_serializer import ContaSerializer, DepositarSerializer, SacarSerializer, SaldoSerializer, TransferirSerializer
+from strongbank.serializers.cliente_serializer import ClienteSerializer
+from strongbank.serializers.conta_serializer import ContaSerializer, ContaDadosSensiveisSerializer, DepositarSerializer, SacarSerializer, SaldoSerializer, TransferirSerializer
 from strongbank.serializers.transacao_serializer import TransacaoSerializer
 
 class ContaViewset(viewsets.ModelViewSet):
@@ -23,8 +24,20 @@ class ContaViewset(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         cliente = Cliente.objects.get(dono=request.user)
         dados_sensiveis = request.data['dados_sensiveis']
+
+        serializer = ContaDadosSensiveisSerializer(data=dados_sensiveis)
+        serializer.is_valid(raise_exception=True)
+
         dados = ContaDadosSensiveis.objects.create(saldo=dados_sensiveis['saldo'])
         dados.save()
+
+        request.data['dados_sensiveis'] = dados
+        request.data['cliente'] = {'nome': cliente.nome, 'endereco': cliente.endereco,
+                                   'celular': cliente.celular, 'documento': cliente.documento,
+                                   'tipo': cliente.tipo}
+
+        serializer = ContaSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
         nova_conta = Conta.objects.create(agencia=request.data['agencia'],
                                           tipo=request.data['tipo'], 
@@ -32,7 +45,6 @@ class ContaViewset(viewsets.ModelViewSet):
                                           dados_sensiveis=dados)
         nova_conta.save()
 
-        serializer = ContaSerializer(nova_conta)
 
         return Response(serializer.data, status=201)
 

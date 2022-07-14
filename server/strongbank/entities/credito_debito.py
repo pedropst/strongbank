@@ -1,10 +1,12 @@
 from decimal import Decimal
+
 from strongbank.entities.cartao import Cartao
 from strongbank.entities.conta import AcoesConta
 from strongbank.exceptions.saldo_insuficiente_transferencia_error import SaldoInsuficienteParaTransferenciaError
+from strongbank.exceptions.limite_insuficiente_error import LimiteInsuficienteError
 
 
-class CartaoCreditoEDebito():
+class AcoesCartao():
     @property
     def numero(self):
         return self.__numero
@@ -47,12 +49,13 @@ class CartaoCreditoEDebito():
 
     def pagar_debito(self, valor: float, conta: AcoesConta):
         valor = Decimal(valor)
-        try:
-            conta.usar_cartao(valor)
+        if conta.dados_sensiveis.saldo >= valor:
+            conta.dados_sensiveis.saldo -= valor
+            conta.dados_sensiveis.save()
             return True
-        except SaldoInsuficienteParaTransferenciaError as e:
-            e.message = 'CONTA | Transferência não permitida: saldo insuficiente'
-            raise e
+        else:
+            raise SaldoInsuficienteParaTransferenciaError({'ERRO':'CONTA | Pagamento não permitida: saldo insuficiente.'})
+
 
     def pagar_credito(self, valor: float):
         valor = Decimal(valor)
@@ -62,11 +65,4 @@ class CartaoCreditoEDebito():
             self.save()
             return True
         else:
-            return False # RAISE ERRO LIMITE INSUFICIENTE
-            
-        # try:
-            
-        # except SaldoInsuficienteParaTransferenciaError as e:
-        #     e.message = 'CONTA | Transferência não permitida: saldo insuficiente'
-        #     raise e
-
+            raise LimiteInsuficienteError({'ERRO':'CARTÃO | Pagamento não permitido: limite insuficiente.'})

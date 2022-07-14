@@ -35,8 +35,7 @@ class PagarCreditoViewset(viewsets.ViewSet):
             faturas = sorted(faturas, key=lambda x: datetime(x.ano_ref, x.mes_ref, 1))
 
         faturas = [f for f in faturas if datetime(f.ano_ref, f.mes_ref, 1) >= datetime.today()]
-        if request.data['parcelas'] > 12:
-            pass #LEVANTAR ERRO (PROGRAMADOR NÃO TEVE TEMPO -> ESSE CARTÃO SÓ ACEITA EM ATÉ 12 VEZES)
+
         if cartao.pagar_credito(request.data['valor']):
             if len(faturas) == 0:
                 for p in range(request.data['parcelas'] + 1)[1:]:
@@ -99,7 +98,8 @@ class PagarDebitoViewset(viewsets.ViewSet):
         if cartao.pagar_debito(request.data['valor'], conta):
             nova_transacao = Transacao.objects.create(tipo='PC',
                                                       cliente = cliente,
-                                                      valor = request.data['valor'])
+                                                      valor = request.data['valor'],
+                                                      descricao = request.data['descricao'])
             nova_transacao.save()
         return Response({'status': 'Pagamento realizado com sucesso!'}, status=200)
 
@@ -132,26 +132,26 @@ class CartaoViewset(viewsets.ModelViewSet):
         dados.save()
 
         nome_cliente = cliente.nome
-        nomes = []
-        if len(nome_cliente.split(' ')) == 2:
-            nomes.append(nome_cliente.split(' ')[0])
-            nomes.append(nome_cliente.split(' ')[1])
+        nomes_separados = nome_cliente.split(' ')
+        if len(nomes_separados) == 2:
+            nome = nome_cliente
         else:
+            nomes = []
             nomes.append(nome_cliente.split(' ')[0])
             nomes.extend([n[0] for n in nome_cliente.split(' ')[1:-1]])
             nomes.append(nome_cliente.split(' ')[-1])
-
+            
         nome = ''
         for n in nomes:
             nome += f'{n} '
         nome = nome[:-1]
-
 
         todos_numeros = [x.numeracao for x in list(Cartao.objects.all())]
         numeracao = '5431' + str(randint(10**11, (10**12)-1))
         while numeracao in todos_numeros :
             numeracao = '5431' + str(randint(10**11, (10**12)-1))
 
+        
         if 'dia_vencimento' not in (request.data.keys()):
             raise serializers.ValidationError({'ERRO':'O "dia_vencimento" não informado.'}, code=400)
         elif 'limite_total' not in (request.data.keys()):

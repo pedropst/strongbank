@@ -6,7 +6,7 @@ from essentials import get_account_info
 from helpers import html_to_fstring
 
 
-st.set_page_config(page_title="STRONG BANK - Customer Create", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="STRONG BANK - Register Customer", initial_sidebar_state="collapsed", page_icon=FR"client\resources\images\logo_icon.png")
 
 def account_create_page():
     with open('client/styles/style.css', 'r') as f:
@@ -41,6 +41,7 @@ def account_create_page():
         if response.status_code == 201:
             st.markdown("<a target='_self' href='http://localhost:8501/account' class='botao_voltar' style='position:absolute; right:50px'><input type=button value='Avançar'></a>", unsafe_allow_html=True)
         else:
+            # breakpoint()
             st.write(response.json())
 
     html = """    <div style="display: flex; justify-content: center; align-items: center; margin: 20px;">

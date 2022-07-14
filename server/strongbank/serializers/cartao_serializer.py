@@ -49,7 +49,7 @@ class PagarCreditoSerializer(serializers.Serializer):
         return valor
 
     def validate_parcelas(self, parcelas):
-        if parcelas <= 0:
+        if parcelas <= 0 or parcelas > 12:
             raise serializers.ValidationError(('A quantidade de parcelas precisa ser entre 1 e 12.'), code=400)
         return parcelas
 
@@ -58,7 +58,7 @@ class PagarCreditoSerializer(serializers.Serializer):
 
 class PagarDebitoSerializer(serializers.Serializer):
     class Meta:
-        fields = ['valor']
+        fields = ['valor', 'descricao']
 
     def validate(self, request):
         if 'valor' not in (self.context.data.keys()):
@@ -73,3 +73,7 @@ class PagarDebitoSerializer(serializers.Serializer):
             raise serializers.ValidationError(('Valor INVÁLIDO.'), code=400)
         return valor
 
+    def validate_valor(self, descricao):
+        if not descricao:
+            raise serializers.ValidationError(('Descrição INVÁLIDA.'), code=400)
+        return descricao

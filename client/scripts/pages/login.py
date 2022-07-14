@@ -6,7 +6,7 @@ from essentials import get_account_info, get_cliente
 from helpers import html_to_fstring
 
 
-st.set_page_config(page_title="STRONG BANK - Login", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="STRONG BANK - Login", initial_sidebar_state="collapsed", page_icon=FR"client\resources\images\logo_icon.png")
 
 def login_page():
     with open('client/styles/style.css', 'r') as f:

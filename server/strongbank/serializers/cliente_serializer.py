@@ -27,6 +27,15 @@ class ClienteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'Erro':'Espera-se um nome completo, no mínimo 1 nome e 1 sobrenome.'})
         return nome
 
+    # def validate_documento(self, documento: str) -> None:
+    #     """
+    #         Verifica se o documento é único na base.
+    #     """
+    #     cliente = Cliente.objects.filter(documento=documento)
+    #     if cliente:
+    #         raise serializers.ValidationError({'Erro':'Já existe cliente com esse CPF ou CNPJ.'})
+    #     return documento
+
     def validate_tipo_e_documento(self, data) -> None:
         """
             Verifica se os campos de CPF e CNPJ foram preenchidos conforme a quantidade de caracteres esperadas.

@@ -4,8 +4,7 @@ from essentials import get_saldo, get_cliente
 from helpers import html_to_fstring
 
 
-st.set_page_config(page_title="STRONG BANK - Home", initial_sidebar_state="collapsed")
-
+st.set_page_config(page_title="STRONG BANK - Home", initial_sidebar_state="collapsed", page_icon=FR"client\resources\images\logo_icon.png")
 def home_page():
     with open('client/styles/style.css', 'r') as f:
         css_to_inject = f.read()

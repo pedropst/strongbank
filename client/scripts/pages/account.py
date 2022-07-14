@@ -6,7 +6,7 @@ from essentials import get_account_info
 from helpers import html_to_fstring
 
 
-st.set_page_config(page_title="STRONG BANK - Account Create", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="STRONG BANK - Register Account", initial_sidebar_state="collapsed", page_icon=FR"client\resources\images\logo_icon.png")
 
 def account_create_page():
     with open('client/styles/style.css', 'r') as f:

@@ -42,6 +42,11 @@ class ContaSerializer(serializers.ModelSerializer):
             validated_data['numero'] = self.numero
         return super().create(validated_data)
 
+    def validate_agencia(self, agencia):
+        if len(agencia) != 4:
+            raise serializers.ValidationError(("Número de 'agência' INVÁLIDO."), code=400)
+        return agencia
+
 
 class ContaDadosSensiveisSerializer(serializers.ModelSerializer):
     saldo = serializers.DecimalField(max_digits=15, decimal_places=4)
@@ -49,6 +54,11 @@ class ContaDadosSensiveisSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContaDadosSensiveis
         fields = ['saldo']
+
+    def validate(self, attrs):
+        if attrs.get('saldo') < 0:
+            raise serializers.ValidationError(('Saldo INVÁLIDO.'), code=400)
+        return super().validate(attrs)
 
 
 class TransferirSerializer(serializers.Serializer):

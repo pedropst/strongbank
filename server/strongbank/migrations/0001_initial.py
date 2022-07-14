@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 ('limite_desbloqueado', models.DecimalField(decimal_places=4, default=Decimal('0'), max_digits=15)),
                 ('bandeira', models.CharField(max_length=20)),
             ],
-            bases=(strongbank.entities.credito_debito.CartaoCreditoEDebito, models.Model),
+            bases=(strongbank.entities.credito_debito.AcoesCartao, models.Model),
         ),
         migrations.CreateModel(
             name='CartaoDadosSensiveis',

@@ -15,3 +15,8 @@ def img_to_bytes():
     img_bytes = Path(FR"client\resources\images\logo_baixo.png").read_bytes()
     encoded = base64.b64encode(img_bytes).decode()
     return encoded
+
+def img_to_bytes1():
+    img_bytes = Path(FR"client\resources\images\logo_icon.png").read_bytes()
+    encoded = base64.b64encode(img_bytes).decode()
+    return encoded

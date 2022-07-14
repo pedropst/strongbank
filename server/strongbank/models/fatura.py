@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
-from django.db import models
 from uuid import uuid4
+from django.db import models
 
 from strongbank.models.cartao import Cartao
 
@@ -20,5 +20,4 @@ class Fatura(models.Model):
         self.ano_ref = (datetime.today() + timedelta(days=31)).date().year
 
     def __str__(self) -> str:
-        return str(self.mes_ref).zfill(2)+str(self.ano_ref)
-
+        return str(self.mes_ref).zfill(2) + str(self.ano_ref)
