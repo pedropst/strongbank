@@ -37,7 +37,7 @@ class PagarCreditoViewset(viewsets.ViewSet):
         faturas = [f for f in faturas if datetime(f.ano_ref, f.mes_ref, 1) >= datetime.today()]
 
         if cartao.pagar_credito(request.data['valor']):
-            if len(faturas) == 0:
+            if not len(faturas):
                 for p in range(request.data['parcelas'] + 1)[1:]:
                     nova_fatura = Fatura.objects.create(mes_ref = datetime.today().month + p if datetime.today().month + p <= 12 else datetime.today().month + p - 12,
                                                         ano_ref = datetime.today().year if datetime.today().month + p <= 12 else datetime.today().year + 1,
@@ -58,8 +58,8 @@ class PagarCreditoViewset(viewsets.ViewSet):
                     f.save()
                     nova_parcela.save()
                 for p in range(request.data['parcelas'] + 1 - len(faturas))[1:]:
-                    nova_fatura = Fatura.objects.create(mes_ref = datetime.today().month + p if datetime.today().month + p <= 12 else datetime.today().month + p - 12,
-                                                        ano_ref = datetime.today().year if datetime.today().month + p <= 12 else datetime.today().year + 1,
+                    nova_fatura = Fatura.objects.create(mes_ref = datetime.today().month + p + len(faturas) if datetime.today().month + p + len(faturas) <= 12 else datetime.today().month + p - 12 + len(faturas),
+                                                        ano_ref = datetime.today().year if datetime.today().month + p + len(faturas) <= 12 else datetime.today().year + 1,
                                                         total= Decimal(request.data['valor']/request.data['parcelas']),
                                                         parcial= Decimal(0),
                                                         cartao = cartao)
@@ -131,17 +131,18 @@ class CartaoViewset(viewsets.ModelViewSet):
         dados = CartaoDadosSensiveis.objects.create(cvv=str(randint(100,999)))
         dados.save()
 
+        nome = ''
         nome_cliente = cliente.nome
         nomes_separados = nome_cliente.split(' ')
+        nomes = []
+
         if len(nomes_separados) == 2:
             nome = nome_cliente
         else:
-            nomes = []
             nomes.append(nome_cliente.split(' ')[0])
             nomes.extend([n[0] for n in nome_cliente.split(' ')[1:-1]])
             nomes.append(nome_cliente.split(' ')[-1])
             
-        nome = ''
         for n in nomes:
             nome += f'{n} '
         nome = nome[:-1]

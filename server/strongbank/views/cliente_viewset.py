@@ -1,7 +1,7 @@
 from django.db import transaction
-from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework import permissions
+from rest_framework.response import Response
 from strongbank.models.cliente import Cliente
 from strongbank.permissions import IsOwnerOrReadOnly, IsUpdateProfile
 from strongbank.serializers.cliente_serializer import ClienteSerializer
@@ -9,19 +9,20 @@ from rest_framework import status
 
 class ClienteViewset(viewsets.ModelViewSet):
     queryset = Cliente.objects.all()
-    serializer_class = ClienteSerializer
+    serializer_class = ClienteSerializer    
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request, *args, **kwargs):
         request.data['documento'] = request.data['cpf'] if request.data['tipo'] == 'PF' else request.data['cnpj']
-        serializer = ClienteSerializer(data=request.data)
+        serializer = ClienteSerializer(data=request.data, context=request)
         serializer.is_valid(raise_exception=True)
         
         novo_cliente = Cliente.objects.create(nome=request.data['nome'], 
                                         endereco=request.data['endereco'], 
                                         celular=request.data['celular'], 
                                         documento=request.data['cpf'] if request.data['tipo'] == 'PF' else request.data['cnpj'],
+                                        tipo=request.data['tipo'],
                                         dono=request.user)
         novo_cliente.save()
 

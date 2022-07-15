@@ -30,11 +30,11 @@ class ContaTestCase(TestCase):
         self.client_not_auth = APIClient()
 
 
-        Cliente.objects.create(nome="Bianca", endereco="Rua dos Moradores Bonitos 274", 
-                        celular="1515", documento="1", tipo="PF",
+        Cliente.objects.create(nome="Bianca dos Santos", endereco="Rua dos Moradores Bonitos 274", 
+                        celular="5567992499955", documento="12345678901", tipo="PF",
                         dono=self.owner)
 
-        self.cliente = Cliente.objects.get(nome="Bianca")
+        self.cliente = Cliente.objects.get(nome="Bianca dos Santos")
 
         self.dados = ContaDadosSensiveis.objects.create(saldo=5000)
 

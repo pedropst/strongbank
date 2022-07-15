@@ -27,14 +27,18 @@ class ClienteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'Erro':'Espera-se um nome completo, no mínimo 1 nome e 1 sobrenome.'})
         return nome
 
-    # def validate_documento(self, documento: str) -> None:
-    #     """
-    #         Verifica se o documento é único na base.
-    #     """
-    #     cliente = Cliente.objects.filter(documento=documento)
-    #     if cliente:
-    #         raise serializers.ValidationError({'Erro':'Já existe cliente com esse CPF ou CNPJ.'})
-    #     return documento
+    def validate_documento(self, documento: str) -> None:
+        """
+            Verifica se o documento é único na base.
+        """
+        if self.context.path == '/cliente/' and self.context.method == 'POST':
+            cliente = Cliente.objects.filter(documento=documento)
+            if cliente:
+                raise serializers.ValidationError({'Erro':'Já existe cliente com esse CPF ou CNPJ.'})
+        else:
+            if not documento.isnumeric():
+                serializers.ValidationError({'Erro':'Valor inválido, precisa ser composto somente por números.'})
+        return documento
 
     def validate_tipo_e_documento(self, data) -> None:
         """

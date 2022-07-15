@@ -29,7 +29,7 @@ def deposit_page():
     st.markdown(html_to_inject, unsafe_allow_html=True)
 
     if value and submit:
-        data = {"valor":float(value)}
+        data = {'valor':float(value), 'descricao':description}
         response = requests.post(url='http://127.0.0.1:8000/depositar/', json=data, auth=get_account_info())
 
         if response.status_code == 200:

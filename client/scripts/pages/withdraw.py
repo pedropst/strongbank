@@ -31,7 +31,7 @@ def withdraw_page():
     st.markdown(html_to_inject, unsafe_allow_html=True)
 
     if value and password and submit:
-        data = {"valor": float(value), "senha":password}
+        data = {'valor': float(value), 'senha':password, 'descricao':description}
         response = requests.post(url='http://127.0.0.1:8000/sacar/', json=data, auth=get_account_info())
 
         if response.status_code == 200:

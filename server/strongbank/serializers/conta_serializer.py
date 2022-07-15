@@ -88,19 +88,28 @@ class SacarSerializer(serializers.Serializer):
 
     def validate_valor(self, valor):
         if valor <= 0:
-            raise serializers.ValidationError(('Valor INVÁLIDO.'), code=400)
+            raise serializers.ValidationError({'Erro':'Valor inválido, precisa ser maior do que 0.'}, code=400)
         return valor
 
     def validate_senha(self, senha: str) -> None:
         if not self.context.user.check_password(senha):
-            raise serializers.ValidationError(('Senha INVÁLIDA.'), code=400)
+            raise serializers.ValidationError({'Erro':'Senha inválida, não corresponde a senha do login.'}, code=400)
         return senha
 
 
 class DepositarSerializer(serializers.Serializer):
     class Meta:
-        fields = ['documento', 'valor']
+        fields = ['valor']
 
+    def __init__(self, instance=None, data=..., **kwargs):
+        self.validate_valor(data['valor'])
+        super().__init__(instance, data, **kwargs)
+
+    def validate_valor(self, valor):
+        if valor <= 0:
+            serializers.ValidationError({'Erro':'Valor inválido, precisa ser maior do que 0.'})
+        elif not str(valor).isnumeric():
+            serializers.ValidationError({'Erro':'Valor inválido, precisa ser composto somente por números.'})
 
 class SaldoSerializer(serializers.Serializer):
     class Meta:

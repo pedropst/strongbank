@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework import permissions
 from rest_framework.response import Response
 
 from strongbank.models.cartao import Cartao
@@ -13,7 +14,7 @@ from strongbank.serializers.parcela_serializer import ParcelaSerializer
 
 class FaturaViewset(viewsets.ModelViewSet):
     serializer_class = ParcelaSerializer
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def list(self, request):
         cliente = Cliente.objects.get(dono=request.user)
@@ -25,5 +26,6 @@ class FaturaViewset(viewsets.ModelViewSet):
         serializer = FaturaSerializer(fatura, many=True)
         serializer2 = ParcelaSerializer(parcela, many=True)
         return Response({'FATURAS': serializer.data, 'PARCELAS': serializer2.data}, status=200)
+
 
         

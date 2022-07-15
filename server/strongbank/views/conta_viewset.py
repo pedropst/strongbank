@@ -22,7 +22,7 @@ class ContaViewset(viewsets.ModelViewSet):
 
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request, *args, **kwargs):
-        cliente = Cliente.objects.get(dono=request.user)
+        cliente = Cliente.objects.filter(dono=request.user).all()[0]
         dados_sensiveis = request.data['dados_sensiveis']
 
         serializer = ContaDadosSensiveisSerializer(data=dados_sensiveis)
@@ -32,11 +32,12 @@ class ContaViewset(viewsets.ModelViewSet):
         dados.save()
 
         request.data['dados_sensiveis'] = dados
+        # request.data['cliente'] = cliente
         request.data['cliente'] = {'nome': cliente.nome, 'endereco': cliente.endereco,
                                    'celular': cliente.celular, 'documento': cliente.documento,
                                    'tipo': cliente.tipo}
 
-        serializer = ContaSerializer(data=request.data)
+        serializer = ContaSerializer(data=request.data, context=request)
         serializer.is_valid(raise_exception=True)
 
         nova_conta = Conta.objects.create(agencia=request.data['agencia'],
@@ -58,7 +59,6 @@ class ContaViewset(viewsets.ModelViewSet):
             serializer = ContaSerializer(queryset)
         return Response(serializer.data, status=200)
 
-
 class SacarViewset(viewsets.ViewSet):
     serializer_class = SacarSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -70,30 +70,30 @@ class SacarViewset(viewsets.ViewSet):
 
         serializer = SacarSerializer(data=request.data, context=request)
         serializer.is_valid(raise_exception=True)
-        if request.user.check_password(request.data['senha']):
-            conta.sacar(request.data['valor'])
-            nova_transacao = Transacao.objects.create(tipo='S',
-                                                    cliente = cliente,
-                                                    valor = request.data['valor'])
-            nova_transacao.save()
-            return Response({'status': 'Saque efetuado com sucesso!'}, status=200)
 
+        # if request.user.check_password(request.data['senha']):
+        conta.sacar(request.data['valor'])
 
+        nova_transacao = Transacao.objects.create(tipo='S',
+                                                  cliente = cliente,
+                                                  valor = request.data['valor'],
+                                                  descricao = request.data['descricao'])
+        nova_transacao.save()
+          
+        return Response({'status': 'Saque efetuado com sucesso!'}, status=200)
 
 class SaldoViewset(viewsets.ViewSet):
     serializer_class = SaldoSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def list(self, request):
-        # cliente = Cliente.objects.get(documento=request.data['documento'])
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
         return Response(conta.saldo, status=200)
 
-
 class ExtratoViewset(viewsets.ViewSet):
     serializer_class = TransacaoSerializer
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def create(self, request, *args, **kwargs):
         cliente = Cliente.objects.get(dono=request.user)
@@ -103,29 +103,30 @@ class ExtratoViewset(viewsets.ViewSet):
         serializer = TransacaoSerializer(extrato, many=True)
         return Response(serializer.data, status=200)
 
-
 class DepositarViewset(viewsets.ViewSet):
     serializer_class = DepositarSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def create(self, request, *args, **kwargs):
-        # cliente = Cliente.objects.get(documento=request.data['documento'])
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
         
         nova_transacao = Transacao.objects.create(tipo='D',
                                                   cliente = cliente,
-                                                  valor = request.data['valor'])
+                                                  valor = request.data['valor'],
+                                                  descricao = request.data['descricao'])
         nova_transacao.save()
-        conta.depositar(request.data['valor'])
-        return Response({'status': 'Depósito efetuado com sucesso!'}, status=200)
-        # if AC.depositar(conta, request.data['valor']):
-        #     return Response({'status': 'OK'}, status=200)
 
+        serializer = DepositarSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        conta.depositar(request.data['valor'])
+        
+        return Response({'status': 'Depósito efetuado com sucesso!'}, status=200)
 
 class TransferirViewset(viewsets.ViewSet):
     serializer_class = TransferirSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request):
@@ -141,6 +142,7 @@ class TransferirViewset(viewsets.ViewSet):
         serializer.is_valid(raise_exception=True)
 
         conta_remetente.transferir(request.data['valor'], conta_destinatario)
+
         nova_transacao = Transacao.objects.create(tipo='TE',
                                                   cliente = cliente_remetente,
                                                   valor = request.data['valor'])
@@ -150,8 +152,6 @@ class TransferirViewset(viewsets.ViewSet):
                                                   cliente = cliente_destinatario,
                                                   valor = request.data['valor'])
         nova_transacao.save()
-        return Response({'status': 'Transferência efetuada com sucesso!'}, status=200)
-        # if AC.transferir(conta_remetente, request.data['valor'], conta_destinatario):
-            # return Response({'status': 'OK'}, status=200)
 
+        return Response({'status': 'Transferência efetuada com sucesso!'}, status=200)
             

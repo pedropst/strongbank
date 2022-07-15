@@ -14,7 +14,7 @@ from rest_framework.authtoken.models import Token
 
 payload = {
             "valor":100,
-            "doc_destinatario":"11565662",
+            "doc_destinatario":"12345678902",
             "numero":"",
             "agencia":"",
             "senha":"123456"
@@ -22,7 +22,7 @@ payload = {
 
 payload_incorreto = {
                         "valor":100,
-                        "doc_destinatario":"11565662",
+                        "doc_destinatario":"12345678902",
                         "numero":"",
                         "agencia":"",
                         "senha":"56155156"
@@ -42,23 +42,24 @@ class AcoesContaTestCase(TestCase):
 
         self.dados = ContaDadosSensiveis.objects.create(saldo=5000)
 
-        Cliente.objects.create(nome="Bianca", endereco="Rua dos Moradores Bonitos 274", 
-                        celular="1515", documento="118659326", tipo="PF",
+        Cliente.objects.create(nome="Bianca dos Santos", endereco="Rua dos Moradores Bonitos 274", 
+                        celular="5567992495566", documento="12345678901", tipo="PF",
                         dono=self.owner1)
 
-        self.cliente1 = Cliente.objects.get(nome="Bianca")
+        self.cliente1 = Cliente.objects.get(nome="Bianca dos Santos")
         Conta.objects.create(cliente=self.cliente1, agencia="0001", dados_sensiveis=self.dados, tipo="PF")
         self.conta1 = Conta.objects.get(cliente=self.cliente1)
+
 
 
         User.objects.create(username="pedro", email="pedro@email.com", password="123456")
         self.owner2 = User.objects.get(username="pedro")
 
-        Cliente.objects.create(nome="Pedro", endereco="Rua dos Moradores Bonitos 274", 
-                celular="156156", documento="11565662", tipo="PF",
+        Cliente.objects.create(nome="Pedro Henrique", endereco="Rua dos Moradores Bonitos 274", 
+                celular="5567992495566", documento="12345678902", tipo="PF",
                 dono=self.owner2)
 
-        self.cliente2 = Cliente.objects.get(nome="Pedro")
+        self.cliente2 = Cliente.objects.get(nome="Pedro Henrique")
         self.dados = ContaDadosSensiveis.objects.create(saldo=5000)
         Conta.objects.create(cliente=self.cliente2, agencia="0001", dados_sensiveis=self.dados, tipo="PF")
         self.conta2 = Conta.objects.get(cliente=self.cliente2)
@@ -128,7 +129,7 @@ class AcoesContaTestCase(TestCase):
 
         self.assertEqual(self.conta1.saldo, 4500)
 
-    def test_aumentar_saldo_quando_sacado(self):
+    def test_aumentar_saldo_quando_depositado(self):
         self.client_auth.post('/depositar/', {'valor':500}, format='json')
 
         self.assertEqual(self.conta1.saldo, 5500)
@@ -144,25 +145,25 @@ class AcoesContaTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
     
     def test_retonar_200_quando_tirar_extrato(self):
-        response = self.client_auth.post('/extrato/', {"dta_inicial":"09/07/2022", "dta_final":"13/07/2022"}, format='json')
+        response = self.client_auth.post('/extrato/', {"dta_inicial":"09/07/2022", "dta_final":"31/12/2022"}, format='json')
 
         self.assertEqual(response.status_code, 200)
     
     def test_retonar_vazio_quando_tirar_extrato_sem_transacoes_previas(self):
-        response = self.client_auth.post('/extrato/', {"dta_inicial":"09/07/2022", "dta_final":"13/07/2022"}, format='json')
+        response = self.client_auth.post('/extrato/', {"dta_inicial":"09/07/2022", "dta_final":"31/12/2022"}, format='json')
 
         self.assertEqual(response.json(), [])
     
     def test_retonar_transacao_quando_tirar_extrato_com_transacao_previa(self):
         self.client_auth.post('/sacar/', {'valor':500, 'senha':123456}, format='json')
-        response = self.client_auth.post('/extrato/', {"dta_inicial":"09/07/2022", "dta_final":"13/07/2022"}, format='json')
+        response = self.client_auth.post('/extrato/', {"dta_inicial":"09/07/2022", "dta_final":"31/12/2022"}, format='json')
 
         self.assertEqual(len(response.json()), 1)
     
     def test_retonar_transacoes_quando_tirar_extrato_com_transacoes_previas(self):
         self.client_auth.post('/sacar/', {'valor':500, 'senha':123456}, format='json')
         self.client_auth.post('/depositar/', {'valor':500}, format='json')
-        response = self.client_auth.post('/extrato/', {"dta_inicial":"09/07/2022", "dta_final":"13/07/2022"}, format='json')
+        response = self.client_auth.post('/extrato/', {"dta_inicial":"09/07/2022", "dta_final":"31/12/2022"}, format='json')
 
         self.assertEqual(len(response.json()), 2)
 
