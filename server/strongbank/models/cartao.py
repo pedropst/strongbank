@@ -33,11 +33,11 @@ class Cartao(AcoesCartao, models.Model):
     dados_sensiveis = models.OneToOneField(
         CartaoDadosSensiveis, on_delete=models.CASCADE)
     limite_total = models.DecimalField(
-        max_digits=15, decimal_places=4, default=Decimal(0))
+        max_digits=15, decimal_places=2, default=Decimal(0))
     limite_disponivel = models.DecimalField(
-        max_digits=15, decimal_places=4, default=Decimal(0))
+        max_digits=15, decimal_places=2, default=Decimal(0))
     limite_desbloqueado = models.DecimalField(
-        max_digits=15, decimal_places=4, default=Decimal(0))
+        max_digits=15, decimal_places=2, default=Decimal(0))
     bandeira = models.CharField(max_length=20)
 
     def __str__(self) -> Any:

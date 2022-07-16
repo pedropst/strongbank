@@ -11,8 +11,8 @@ class Fatura(models.Model):
     cartao = models.ForeignKey(Cartao, on_delete=models.CASCADE)
     mes_ref = models.IntegerField()
     ano_ref = models.IntegerField()
-    total = models.DecimalField(max_digits=15, decimal_places=5, default=Decimal(0))
-    parcial = models.DecimalField(max_digits=15, decimal_places=5, default=Decimal(0))
+    total = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal(0))
+    parcial = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal(0))
     dta_criacao = models.DateField(auto_now=True)
 
     def criar_vencimento(self):

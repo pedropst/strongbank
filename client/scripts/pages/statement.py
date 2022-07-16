@@ -29,12 +29,15 @@ def statement_page():
         data = {"dta_inicial": data_inicial.strftime(r'%d/%m/%Y'),
                 "dta_final": data_final.strftime(r'%d/%m/%Y')}  
         response = requests.post(url='http://127.0.0.1:8000/extrato/', json=data, auth=get_account_info())
-
         if response.status_code == 200:
             df = pd.DataFrame(response.json())
+            # breakpoint()
             df = df.drop(['id', 'cliente'], axis=1)
-            df = df.rename(columns={'tipo':'TIPO', 'dta_criacao':'DATA', 'valor':'VALOR'})
-            st.dataframe(df, width=5000)
+            df = df.rename(columns={'tipo':'TIPO', 'dta_criacao':'DATA', 'valor':'VALOR', 'descricao':'DESCRIÇÃO'})
+            df = df[['DATA', 'TIPO', 'DESCRIÇÃO', 'VALOR']]
+            df['VALOR'] = df['VALOR'].astype('float64')
+            df['VALOR'] = df['VALOR'].apply(lambda x: f'R$ {x:,.2f}'.replace(',', '*').replace('.',',').replace('*','.'))
+            st.dataframe(df, width=750)
             st.legacy_caching.clear_cache()
         else:
             st.write(f'CODE: {response.status_code}')

@@ -1,6 +1,10 @@
+from datetime import datetime
 from decimal import Decimal
 from django.db import models
+
 from uuid import uuid4
+
+import pytz
 
 from strongbank.models.cliente import Cliente
 
@@ -18,8 +22,8 @@ class Transacao(models.Model):
     # cliente = models.OneToOneField(Cliente, on_delete=models.CASCADE, unique=False)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=20, choices=acoes_tipo, default=acoes_tipo[0][0])
-    dta_criacao = models.DateField(auto_now=True)
-    valor = models.DecimalField(max_digits=15, decimal_places=5)
+    dta_criacao = models.DateTimeField(auto_now=True)
+    valor = models.DecimalField(max_digits=15, decimal_places=2)
     descricao = models.CharField(max_length=30, blank=True)
 
     def save(self, *args, **kwargs):

@@ -9,7 +9,7 @@ from strongbank.models.cliente import Cliente
 
 class ContaDadosSensiveis(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    saldo = models.DecimalField(max_digits=15, decimal_places=4)
+    saldo = models.DecimalField(max_digits=15, decimal_places=2)
 
     def save(self, *args, **kwargs):
         signer = Signer()

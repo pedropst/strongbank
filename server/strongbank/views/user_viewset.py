@@ -15,6 +15,9 @@ class UserViewset(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
+        serializer = UserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         user = User.objects._create_user(request.data['username'], request.data['email'], request.data['password'])
         user.is_superuser = True if request.data['tipo'] == 'A' else False
         user.save()
