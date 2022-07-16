@@ -15,11 +15,15 @@ from strongbank.models.fatura import Fatura
 from strongbank.models.parcela import Parcela
 from strongbank.models.transacao import Transacao
 from strongbank.permissions import IsOwnerOrReadOnly, IsUpdateProfile
-from strongbank.serializers.cartao_serializer import  CartaoSerializer, PagarCreditoSerializer, PagarDebitoSerializer
+from strongbank.serializers.cartao_serializer import  CartaoSerializer, PagarCreditoSerializer, PagarDebitoSerializer, AlterarBloqueioSerializer, AlterarLimiteSerializer
 
 class PagarCreditoViewset(viewsets.ViewSet):
+    """
+        Classe reponsável por implementar o endpoint do pagamento por creédito.
+        Esse endpoint requer autenticação para acessá-lo.
+    """
     serializer_class = PagarCreditoSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request):
@@ -82,7 +86,7 @@ class PagarCreditoViewset(viewsets.ViewSet):
 
 class PagarDebitoViewset(viewsets.ViewSet):
     serializer_class = PagarDebitoSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request):
@@ -102,6 +106,48 @@ class PagarDebitoViewset(viewsets.ViewSet):
                                                       descricao = request.data['descricao'])
             nova_transacao.save()
         return Response({'status': 'Pagamento realizado com sucesso!'}, status=200)
+
+class AlterarBloqueioViewset(viewsets.ViewSet):
+    serializer_class = AlterarBloqueioSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+
+    def create(self, request):
+        cliente = Cliente.objects.get(dono=request.user)
+        conta = Conta.objects.get(cliente=cliente)
+        cartao = Cartao.objects.get(conta=conta)
+
+        estado_atual = cartao.bloqueado
+        cartao.inverter_estado_bloqueio()
+
+        if estado_atual:
+            return Response({'status': 'Cartão desbloqueado com sucesso!'}, status=200)
+        else:
+            return Response({'status': 'Cartão bloqueado com sucesso!'}, status=200)
+    
+    def list(self, request):
+        cliente = Cliente.objects.get(dono=request.user)
+        conta = Conta.objects.get(cliente=cliente)
+        cartao = Cartao.objects.get(conta=conta)
+        return Response(cartao.bloqueado, status=200)
+
+class AlterarLimiteViewset(viewsets.ViewSet):
+    serializer_class = AlterarLimiteSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+
+    def create(self, request):
+        cliente = Cliente.objects.get(dono=request.user)
+        conta = Conta.objects.get(cliente=cliente)
+        cartao = Cartao.objects.get(conta=conta)
+
+        cartao.alterar_limite(request.data['valor'])
+
+        return Response({'status': 'Cartão bloqueado com sucesso!'}, status=200)
+    
+    def list(self, request):
+        cliente = Cliente.objects.get(dono=request.user)
+        conta = Conta.objects.get(cliente=cliente)
+        cartao = Cartao.objects.get(conta=conta)
+        return Response(cartao.bloqueado, status=200)
 
 
 class CartaoViewset(viewsets.ModelViewSet):
@@ -146,7 +192,8 @@ class CartaoViewset(viewsets.ModelViewSet):
             
         for n in nomes:
             nome += f'{n} '
-        nome = nome[:-1]
+        if nome[-1] == " ":
+            nome = nome[:-1]
 
         todos_numeros = [x.numeracao for x in list(Cartao.objects.all())]
         numeracao = '5431' + str(randint(10**11, (10**12)-1))
@@ -166,13 +213,15 @@ class CartaoViewset(viewsets.ModelViewSet):
                                             numeracao=numeracao,
                                             limite_total=Decimal(request.data['limite_total']),
                                             limite_desbloqueado=Decimal(request.data['limite_total'])*Decimal(0.8),
-                                            limite_disponivel=Decimal(request.data['limite_total']))
+                                            limite_disponivel=Decimal(request.data['limite_total']),
+                                            limite_escolhido=Decimal(request.data['limite_total'])*Decimal(0.8))
         request.data['dados_sensiveis'] = dados
         request.data['nome'] = nome
         request.data['numeracao'] = numeracao
         request.data['limite_total'] = Decimal(request.data['limite_total'])
-        request.data['limite_desbloqueado'] = Decimal(request.data['limite_total'])*Decimal(0.8)
-        request.data['limite_desbloqueado'] = Decimal(request.data['limite_total'])
+        request.data['limite_desbloqueado'] = 0
+        request.data['limite_disponivel'] = 0
+        request.data['limite_escolhido'] = 0
 
         serializer = CartaoSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -192,4 +241,6 @@ class CartaoViewset(viewsets.ModelViewSet):
             conta = Conta.objects.get(cliente=cliente)
             queryset = Cartao.objects.get(conta=conta)
             serializer = CartaoSerializer(queryset)
-        return Response(serializer.data, status=200)
+            cartao = dict(serializer.data)
+            cartao.pop('id')
+        return Response(cartao, status=200)

@@ -7,15 +7,15 @@ from rest_framework.response import Response
 from strongbank.models.cliente import Cliente
 from strongbank.models.conta import Conta, ContaDadosSensiveis
 from strongbank.models.transacao import Transacao
-from strongbank.permissions import IsOwnerOrReadOnly, IsUpdateProfile
-from strongbank.serializers.cliente_serializer import ClienteSerializer
+from strongbank.permissions import IsOwnerOrReadOnly
 from strongbank.serializers.conta_serializer import ContaSerializer, ContaDadosSensiveisSerializer, DepositarSerializer, SacarSerializer, SaldoSerializer, TransferirSerializer
 from strongbank.serializers.transacao_serializer import TransacaoSerializer
 
+
 class ContaViewset(viewsets.ModelViewSet):
     """
-        Classe reponsável por implementar a view do endpoint da conta. Para esse 
-        endpoint é necessário autenticação para acessá-lo.
+        Classe reponsável por implementar o endpoint da conta. 
+        Esse endpoint requer autenticação para acessá-lo.
     """
     serializer_class = ContaSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -41,7 +41,6 @@ class ContaViewset(viewsets.ModelViewSet):
         dados.save()
 
         request.data['dados_sensiveis'] = dados
-        # request.data['cliente'] = cliente
         request.data['cliente'] = {'nome': cliente.nome, 'endereco': cliente.endereco,
                                    'celular': cliente.celular, 'documento': cliente.documento,
                                    'tipo': cliente.tipo}
@@ -54,8 +53,6 @@ class ContaViewset(viewsets.ModelViewSet):
                                           cliente=cliente,
                                           dados_sensiveis=dados)
         nova_conta.save()
-
-
         return Response(serializer.data, status=201)
 
     def list(self, request, *args, **kwargs):
@@ -72,9 +69,10 @@ class ContaViewset(viewsets.ModelViewSet):
             serializer = ContaSerializer(queryset)
         return Response(serializer.data, status=200)
 
+
 class SacarViewset(viewsets.ViewSet):
     """
-        Classe reponsável por implementar a view do endpoint do saque. Para esse 
+        Classe reponsável por implementar o endpoint do saque. Para esse 
         endpoint é necessário autenticação e ser o dono da conta para acessá-lo.
         Portanto, usuários comuns que podem usar saque, já administradores não.
     """
@@ -95,20 +93,20 @@ class SacarViewset(viewsets.ViewSet):
         serializer = SacarSerializer(data=request.data, context=request)
         serializer.is_valid(raise_exception=True)
 
-        # if request.user.check_password(request.data['senha']):
         conta.sacar(request.data['valor'])
-
+        
+        # TODO Validar depósito serializer antes de criar nova_transacao.
         nova_transacao = Transacao.objects.create(tipo='S',
                                                   cliente = cliente,
                                                   valor = request.data['valor'],
                                                   descricao = request.data['descricao'])
         nova_transacao.save()
-          
         return Response({'status': 'Saque efetuado com sucesso!'}, status=200)
+
 
 class SaldoViewset(viewsets.ViewSet):
     """
-        Classe reponsável por implementar a view do endpoint do saldo. Para esse 
+        Classe reponsável por implementar o endpoint do saldo. Para esse 
         endpoint é necessário autenticação e ser o dono da conta para acessá-lo.
         Portanto, usuários comuns que podem usar saldo, já administradores não.
     """
@@ -124,9 +122,10 @@ class SaldoViewset(viewsets.ViewSet):
         conta = Conta.objects.get(cliente=cliente)
         return Response(conta.saldo, status=200)
 
+
 class ExtratoViewset(viewsets.ViewSet):
     """
-        Classe reponsável por implementar a view do endpoint do extrato. Para esse 
+        Classe reponsável por implementar o endpoint do extrato. Para esse 
         endpoint é necessário autenticação e ser o dono da conta para acessá-lo.
         Portanto, usuários comuns que podem usar extrato, já administradores não.
     """
@@ -147,9 +146,10 @@ class ExtratoViewset(viewsets.ViewSet):
         serializer = TransacaoSerializer(extrato, many=True)
         return Response(serializer.data, status=200)
 
+
 class DepositarViewset(viewsets.ViewSet):
     """
-        Classe reponsável por implementar a view do endpoint do depósito. Para esse 
+        Classe reponsável por implementar o endpoint do depósito. Para esse 
         endpoint é necessário autenticação e ser o dono da conta para acessá-lo.
         Portanto, usuários comuns que podem usar depósito, já administradores não.
     """
@@ -166,24 +166,24 @@ class DepositarViewset(viewsets.ViewSet):
         
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
-        
+       
+        serializer = DepositarSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        conta.depositar(request.data['valor'])
+
         # TODO Validar depósito serializer antes de criar nova_transacao.
         nova_transacao = Transacao.objects.create(tipo='D',
                                                   cliente = cliente,
                                                   valor = request.data['valor'],
                                                   descricao = request.data['descricao'])
         nova_transacao.save()
-
-        serializer = DepositarSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        conta.depositar(request.data['valor'])
-        
         return Response({'status': 'Depósito efetuado com sucesso!'}, status=200)
+
 
 class TransferirViewset(viewsets.ViewSet):
     """
-        Classe reponsável por implementar a view do endpoint da transferência. Para esse 
+        Classe reponsável por implementar o endpoint da transferência. Para esse 
         endpoint é necessário autenticação e ser o dono da conta para acessá-lo.
         Portanto, usuários comuns que podem usar transferência, já administradores não.
     """
@@ -191,7 +191,7 @@ class TransferirViewset(viewsets.ViewSet):
     serializer_class = TransferirSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
-    @transaction.atomic # To create either BOTH or NONE
+    @transaction.atomic # Ou cria todas as novas instâncias ou nenhuma.
     def create(self, request):
         """
             Método responsável pela "criação" de uma transferência. Para isso é
@@ -204,7 +204,6 @@ class TransferirViewset(viewsets.ViewSet):
 
         cliente_remetente = Cliente.objects.get(dono=request.user)
         conta_remetente = Conta.objects.get(cliente=cliente_remetente)
-
         cliente_destinatario = Cliente.objects.get(documento=request.data['doc_destinatario'])
         conta_destinatario = Conta.objects.get(cliente=cliente_destinatario, 
                                                numero=request.data['numero'],
@@ -214,16 +213,16 @@ class TransferirViewset(viewsets.ViewSet):
         serializer.is_valid(raise_exception=True)
 
         conta_remetente.transferir(request.data['valor'], conta_destinatario)
-
+        
+        # TODO Validar depósito serializer antes de criar nova_transacao.
         nova_transacao = Transacao.objects.create(tipo='TE',
                                                   cliente = cliente_remetente,
                                                   valor = request.data['valor'])
         nova_transacao.save()
 
+        # TODO Validar depósito serializer antes de criar nova_transacao.
         nova_transacao = Transacao.objects.create(tipo='TR',
                                                   cliente = cliente_destinatario,
                                                   valor = request.data['valor'])
         nova_transacao.save()
-
         return Response({'status': 'Transferência efetuada com sucesso!'}, status=200)
-            

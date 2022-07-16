@@ -46,9 +46,6 @@ def register_page():
 
     st.markdown(html_to_inject, unsafe_allow_html=True)
 
-    new_account_html = '<a target="_self" href="http://localhost:8501/register" style="color:#FFFFFF; font-weight:1000; padding:20px">Criar uma nova conta</a>'
-    st.markdown(new_account_html, unsafe_allow_html=True)
-
 
 register_page()
 

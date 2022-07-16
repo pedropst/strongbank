@@ -1,7 +1,7 @@
 import json
 import streamlit as st
 import requests
-from essentials import get_account_info, get_cliente
+from essentials import get_account_info, get_customer
 
 from helpers import html_to_fstring
 
@@ -35,7 +35,7 @@ def login_page():
 
         if response.status_code == 200:
             try:
-                get_cliente()
+                get_customer()
                 st.markdown("<a target='_self' href='http://localhost:8501/home' class='botao_voltar' style='position:absolute; right:50px'><input type=button value='Avançar'></a>", unsafe_allow_html=True)
             except requests.JSONDecodeError:
                 st.markdown("<a target='_self' href='http://localhost:8501/customer' class='botao_voltar' style='position:absolute; right:50px'><input type=button value='Avançar'></a>", unsafe_allow_html=True)

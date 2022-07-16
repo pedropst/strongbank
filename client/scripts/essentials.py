@@ -13,7 +13,7 @@ def get_account_info():
         ACCOUNT_INFO = json.load(json_file)
     return ACCOUNT_INFO['username'], ACCOUNT_INFO['password']
 
-def get_cliente():
+def get_customer():
     return requests.get(url='http://127.0.0.1:8000/cliente/', auth=get_account_info()).json()
 
 def get_cartao():
@@ -21,3 +21,6 @@ def get_cartao():
     
 def get_saldo():
     return f"{requests.get(url='http://127.0.0.1:8000/saldo/', auth=get_account_info()).json():,.2f}".replace(',', '*').replace('.',',').replace('*','.')
+
+def get_bank_account():
+   return requests.get(url='http://127.0.0.1:8000/conta/', auth=get_account_info()).json()

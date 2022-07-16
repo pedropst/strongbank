@@ -49,6 +49,8 @@ class Cartao(AcoesCartao, models.Model):
         max_digits=15, decimal_places=2, default=Decimal(0))
     limite_desbloqueado = models.DecimalField(
         max_digits=15, decimal_places=2, default=Decimal(0))
+    limite_escolhido = models.DecimalField(
+        max_digits=15, decimal_places=2, default=Decimal(0))
     bandeira = models.CharField(max_length=20)
 
     def __str__(self) -> Any:

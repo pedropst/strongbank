@@ -1,7 +1,7 @@
 import requests
 import streamlit as st
 
-from essentials import get_saldo, get_cliente, get_account_info
+from essentials import get_saldo, get_customer, get_account_info
 from helpers import html_to_fstring, img_to_bytes
 
 

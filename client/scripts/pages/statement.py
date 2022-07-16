@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 import json
 
-from essentials import get_saldo, get_cliente, get_account_info
+from essentials import get_saldo, get_customer, get_account_info
 from helpers import html_to_fstring
 
 

@@ -3,6 +3,17 @@ from rest_framework import serializers
 from strongbank.models.cliente import Cliente
 
 
+"""
+"Each field in a Form class is responsible not only for validating data, 
+but also for "cleaning" it — normalizing it to a consistent format."
+                                                
+                                                — Django documentation
+
+Mas como estamos usando DRF, em 'Form' lê-se 'Serializer'.
+
+https://www.django-rest-framework.org/api-guide/fields/
+"""
+
 class ClienteSerializer(serializers.ModelSerializer):
     """
         Classe responsável pela serialização e deserialização dos clientes. Também
@@ -64,5 +75,3 @@ class ClienteSerializer(serializers.ModelSerializer):
         if len(celular) != 13:
             raise serializers.ValidationError({'Erro':'Espera-se número de telefone composto só por dígitos, no seguinte modelo: 5567999881520'})
         return celular
-
-    # def validate_dono(self, dono:)

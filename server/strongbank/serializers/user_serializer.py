@@ -9,12 +9,18 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'dono']
+        fields = ['id', 'username', 'password', 'dono']
 
     def validate_username(self, username):
         if len(username) < 6:
-            raise serializers.ValidationError({'ERRO':'"Username precisa ter ao menos 6 caracteres."'})
+            raise serializers.ValidationError({'ERRO':'Username precisa ter ao menos 6 caracteres.'})
         
         return username
+
+    def validate_password(self, password):
+        if len(password) < 6:
+            raise serializers.ValidationError({'ERRO':'Password precisa ter ao menos 6 caracteres.'})
+        
+        return password
 
         

@@ -1,6 +1,6 @@
 import base64
 from pathlib import Path
-from essentials import get_saldo, get_cliente, get_account_info, get_cartao
+from essentials import get_saldo, get_customer, get_account_info, get_cartao, get_bank_account
 
 
 def html_to_fstring(html: str) -> str:

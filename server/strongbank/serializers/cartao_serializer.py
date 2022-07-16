@@ -27,7 +27,7 @@ class CartaoSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Cartao
-        fields = ['nome', 'dia_vencimento', 'numeracao', 'mes_validade', 'ano_validade', 'cvv', 'limite_total', 'limite_desbloqueado', 'limite_disponivel', 'bloqueado']
+        fields = ['id', 'nome', 'dia_vencimento', 'numeracao', 'mes_validade', 'ano_validade', 'cvv', 'limite_total', 'limite_desbloqueado', 'limite_disponivel', 'bloqueado']
 
     def validate_dia_vencimento(self, dia_vencimento):
         """
@@ -47,6 +47,7 @@ class CartaoSerializer(serializers.ModelSerializer):
         if limite_total <= Decimal(0):
             raise serializers.ValidationError({'ERRO':'Limite tem que ser maior do que 0.'})
         return limite_total
+
 
 class PagarCreditoSerializer(serializers.Serializer):
     """
@@ -72,7 +73,6 @@ class PagarCreditoSerializer(serializers.Serializer):
             raise serializers.ValidationError({'ERRO':'O "parcelas" não informado.'}, code=400)
         elif 'descricao' not in (self.context.data.keys()):
             raise serializers.ValidationError({'ERRO':'O "descricao" não informado. Contudo, pode vir em branco.'}, code=400)
-
         return super().validate(request)
 
     def validate_valor(self, valor):
@@ -97,8 +97,6 @@ class PagarCreditoSerializer(serializers.Serializer):
             raise serializers.ValidationError(('A quantidade de parcelas precisa ser entre 1 e 12.'), code=400)
         return parcelas
 
-    
-
 
 class PagarDebitoSerializer(serializers.Serializer):
     """
@@ -122,7 +120,38 @@ class PagarDebitoSerializer(serializers.Serializer):
             raise serializers.ValidationError({'ERRO':'O "valor" não informado.'}, code=400)
         elif 'descricao' not in (self.context.data.keys()):
             raise serializers.ValidationError({'ERRO':'O "descricao" não informado.'}, code=400)
+        return super().validate(request)
 
+    def validate_valor(self, valor):
+        """
+            Método responsável por verificar que request possui o campo 'valor'
+            maior do que 0.
+        """
+
+        if valor <= 0:
+            raise serializers.ValidationError(('Valor INVÁLIDO.'), code=400)
+        return valor
+
+class AlterarBloqueioSerializer(serializers.Serializer):
+    def validate(self, attrs):
+        return super().validate(attrs)
+
+class AlterarLimiteSerializer(serializers.Serializer):
+    """
+        Classe reponsável por implementar as validações da mudança de limite.
+    """
+
+    class Meta:
+        fields = ['valor', 'descricao']
+
+    def validate(self, request):
+        """
+            Método responsável por verificar que request possui o campo
+            necessário para efetuar a mudança de limite: valor.
+        """
+
+        if 'valor' not in (self.context.data.keys()):
+            raise serializers.ValidationError({'ERRO':'O "valor" não informado.'}, code=400)
         return super().validate(request)
 
     def validate_valor(self, valor):

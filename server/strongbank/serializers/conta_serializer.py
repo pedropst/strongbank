@@ -9,18 +9,6 @@ from strongbank.serializers.cliente_serializer import ClienteSerializer
 from strongbank.serializers.transacao_serializer import TransacaoSerializer
 
 
-"""
-"Each field in a Form class is responsible not only for validating data, 
-but also for "cleaning" it — normalizing it to a consistent format."
-                                                
-                                                — Django documentation
-
-Mas como estamos usando DRF, em 'Form' lê-se 'Serializer'.
-
-https://www.django-rest-framework.org/api-guide/fields/
-"""
-
-
 class ContaSerializer(serializers.ModelSerializer):
     """
         Classe responsável pela serialização e deserialização das contas. Também
@@ -29,7 +17,6 @@ class ContaSerializer(serializers.ModelSerializer):
 
     conta_tipo = [('P', 'Poupança'), ('C', 'Corrente')]
 
-    # cliente = serializers.StringRelatedField()
     cliente = ClienteSerializer()
     numero = serializers.CharField(max_length=6, min_length=6, read_only=True)
     agencia = serializers.CharField(max_length=4, min_length=4, required=True)
@@ -46,6 +33,7 @@ class ContaSerializer(serializers.ModelSerializer):
             a geração do número da conta, que é aleatório e único (em relação a 
             base toda, apesar de não ser o primary key).
         """
+
         todos_numeros = [x.numero for x in list(Conta.objects.all())]
         while self.numero in todos_numeros:
             self.numero = str(randint(10**5, (10**6)-1))
@@ -57,6 +45,7 @@ class ContaSerializer(serializers.ModelSerializer):
             Validador da agência de uma conta, permitindo somente número de agência
             composto por 4 digítos.
         """
+
         if len(agencia) != 4:
             raise serializers.ValidationError(("Número de 'agência' INVÁLIDO."), code=400)
         return agencia
@@ -68,7 +57,8 @@ class ContaDadosSensiveisSerializer(serializers.ModelSerializer):
         da conta. Não possui métodos validadores, pois, em nada depende do input
         do usuário.
     """
-    saldo = serializers.DecimalField(max_digits=15, decimal_places=4)
+
+    saldo = serializers.DecimalField(max_digits=15, decimal_places=2)
 
     class Meta:
         model = ContaDadosSensiveis
@@ -79,6 +69,7 @@ class ContaDadosSensiveisSerializer(serializers.ModelSerializer):
             Validador do saldo inicial de uma conta, não permitindo a criação de
             contas com saldo inicial negativo.
         """
+
         if attrs.get('saldo') < 0:
             raise serializers.ValidationError(('Saldo INVÁLIDO.'), code=400)
         return super().validate(attrs)
@@ -91,7 +82,8 @@ class TransferirSerializer(serializers.Serializer):
         tipo de "armazenamento do pagamento", o responsável por isso é o modelo
         Transacao.
     """
-    valor = serializers.DecimalField(max_digits=15, decimal_places=4)
+
+    valor = serializers.DecimalField(max_digits=15, decimal_places=2)
     senha = serializers.CharField(max_length=300)
     
     class Meta:
@@ -102,6 +94,7 @@ class TransferirSerializer(serializers.Serializer):
             Método responsável por verificar que request possui o campo 'valor'
             maior do que 0.
         """
+
         if valor <= 0:
             raise serializers.ValidationError(('Valor INVÁLIDO.'), code=400)
         return valor
@@ -111,6 +104,7 @@ class TransferirSerializer(serializers.Serializer):
             Método responsável por verificar que request possui o campo 'senha'
             válido, conforme a senha do usuário.
         """
+
         if not self.context.user.check_password(senha):
             raise serializers.ValidationError(('Senha INVÁLIDA.'), code=400)
         return senha
@@ -122,7 +116,8 @@ class SacarSerializer(serializers.Serializer):
         base uma classe Modelo, pois, não deseja-se fazer nenhum tipo de 
         "armazenamento da operação", o responsável por isso é o modelo Transacao.
     """
-    valor = serializers.DecimalField(max_digits=15, decimal_places=4)
+
+    valor = serializers.DecimalField(max_digits=15, decimal_places=2)
     senha = serializers.CharField(max_length=300)
     
     class Meta:
@@ -133,8 +128,11 @@ class SacarSerializer(serializers.Serializer):
             Método responsável por verificar que request possui o campo 'valor'
             maior do que 0.
         """
+
         if valor <= 0:
-            raise serializers.ValidationError({'Erro':'Valor inválido, precisa ser maior do que 0.'}, code=400)
+            raise serializers.ValidationError({'Erro':'Valor inválido, precisa ser maior do que 0.'})
+        elif not str(valor).split('.')[0].isnumeric() and str(valor).split('.')[1].isnumeric():
+            raise serializers.ValidationError({'Erro':'Valor inválido, precisa ser composto somente por números.'})
         return valor
 
     def validate_senha(self, senha: str) -> None:
@@ -142,6 +140,7 @@ class SacarSerializer(serializers.Serializer):
             Método responsável por verificar que request possui o campo 'senha'
             válido, conforme a senha do usuário.
         """
+
         if not self.context.user.check_password(senha):
             raise serializers.ValidationError({'Erro':'Senha inválida, não corresponde a senha do login.'}, code=400)
         return senha
@@ -153,22 +152,23 @@ class DepositarSerializer(serializers.Serializer):
         como base uma classe Modelo, pois, não deseja-se fazer nenhum tipo de 
         "armazenamento da operação", o responsável por isso é o modelo Transacao.
     """
+
+    valor = serializers.DecimalField(max_digits=15, decimal_places=2)
+
     class Meta:
         fields = ['valor']
-
-    def __init__(self, instance=None, data=..., **kwargs):
-        self.validate_valor(data['valor'])
-        super().__init__(instance, data, **kwargs)
 
     def validate_valor(self, valor):
         """
             Método responsável por verificar que request possui o campo 'valor'
             maior do que 0.
         """
+
         if valor <= 0:
-            serializers.ValidationError({'Erro':'Valor inválido, precisa ser maior do que 0.'})
-        elif not str(valor).isnumeric():
-            serializers.ValidationError({'Erro':'Valor inválido, precisa ser composto somente por números.'})
+            raise serializers.ValidationError({'Erro':'Valor inválido, precisa ser maior do que 0.'})
+        elif not str(valor).split('.')[0].isnumeric() and str(valor).split('.')[1].isnumeric():
+            raise serializers.ValidationError({'Erro':'Valor inválido, precisa ser composto somente por números.'})
+        return valor
 
 class SaldoSerializer(serializers.Serializer):
     """
@@ -176,6 +176,7 @@ class SaldoSerializer(serializers.Serializer):
         como base uma classe Modelo, pois, não deseja-se fazer nenhum tipo de 
         "armazenamento da operação", sendo um endpoint só de GET.
     """
+
     class Meta:
         fields = ['documento']
     

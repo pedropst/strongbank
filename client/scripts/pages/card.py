@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 import json
 
-from essentials import get_saldo, get_cliente, get_cartao, get_account_info
+from essentials import get_saldo, get_customer, get_cartao, get_account_info
 from helpers import html_to_fstring_com_iterador, html_to_fstring
 
 
@@ -23,7 +23,19 @@ def card_page():
         html = f.read()
         html_to_inject = html_to_fstring(html)
         st.markdown(html_to_inject, unsafe_allow_html=True)
-   
+    
+    with st.expander('Gerenciar'):
+        card_status = 'Desbloquear Cartão' if get_cartao()['bloqueado'] else 'Bloquear Cartão'
+        change_card_status = st.button(card_status)
+        # min_value = 0.0
+        # max_value = float(get_cartao()['limite_total'])
+        # new_unlock_limit = st.slider(label=f"Limite desbloqueado - R$ {get_cartao()['limite_desbloqueado']}", 
+        #                              min_value=min_value, max_value=max_value, step=100.0, 
+        #                              format=f"R$ %f".replace(',', '*').replace('.',',').replace('*','.'), 
+        #                              value=(float(get_cartao()['limite_total']) - float(get_cartao()['limite_disponivel']) + float(get_cartao()['limite_desbloqueado'])))
+        # st.write(f'Novo limite - R$ {new_unlock_limit:,.2f}'.replace(',', '*').replace('.',',').replace('*','.'))
+        # button_new_limit = st.button('Alterar limite')
+
     with st.expander('Pagar com crédito:'):
         with st.form('credit_payment_form'):
             value_c = st.number_input(label='Valor')
@@ -59,6 +71,22 @@ def card_page():
             df = df.rename(columns={'descricao':'DESCRIÇÃO', 'valor':'VALOR', 'dta_criacao': 'DATA'})
             df = df[['DATA', 'DESCRIÇÃO', 'VALOR']]
             st.dataframe(df, width=1200)
+
+    # if button_new_limit:
+    #     response = requests.post(url='http://127.0.0.1:8000/alterarlimite/', json={'valor':new_unlock_limit}, auth=get_account_info())
+    #     if response.status_code == 200:
+    #         st.legacy_caching.clear_cache()
+    #         st.experimental_rerun()
+    #     else:
+    #         st.write(response.json())
+
+    if change_card_status:
+        response = requests.post(url='http://127.0.0.1:8000/alterarbloqueio/', json={}, auth=get_account_info())
+        if response.status_code == 200:
+            st.legacy_caching.clear_cache()
+            st.experimental_rerun()
+        else:
+            st.write(response.json())
 
     if value_c and quantity_c and submit_c:
         data = {"valor":value_c, "descricao":description_c, "parcelas":quantity_c}

@@ -1,6 +1,5 @@
 import streamlit as st
 
-from essentials import get_saldo, get_cliente
 from helpers import html_to_fstring
 
 
