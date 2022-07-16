@@ -107,7 +107,8 @@ class PagarDebitoViewset(viewsets.ViewSet):
 class CartaoViewset(viewsets.ModelViewSet):
     serializer_class = CartaoSerializer
     permission_classes = [permissions.IsAuthenticated]
-
+    # TODO Verificar se não é necessário fazer partial update para salvar o valor da fatura do cartão
+    # quando a mesma já existe, mas foi aumentada por conta de uma nova parcela.
     def get_queryset(self):
         cartoes = Cartao.objects.all()
         return cartoes

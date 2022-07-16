@@ -9,6 +9,11 @@ from strongbank.models.conta import Conta
 
 
 class CartaoDadosSensiveis(models.Model):
+    """
+        Classe responsável por gerar modelo do banco de dados para o registro do
+        cvv do cartão, ficando separado do restante das informações do cartão. E 
+        possuindo como relação o id do cartão.
+    """
     cvv = models.CharField(max_length=3, editable=False)
 
     # def save(self, *args, **kwargs):
@@ -17,6 +22,12 @@ class CartaoDadosSensiveis(models.Model):
 
 
 class Cartao(AcoesCartao, models.Model):
+    """
+        Classe responsável por gerar modelo do banco de dados para o registro
+        dos cartões, possui os seguintes campos: id, conta_id, dia_vencimento,
+        nome, mes_validade, ano_validade, bloqueado, dta_criacao, limite_total,
+        limite_disponivel, limite_desbloqueado, bandeira e dados_sensiveis_id.
+    """
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     conta = models.OneToOneField(Conta, on_delete=models.CASCADE)
     dia_vencimento = models.IntegerField(

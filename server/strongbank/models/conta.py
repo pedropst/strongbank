@@ -8,6 +8,13 @@ from strongbank.models.cliente import Cliente
 
 
 class ContaDadosSensiveis(models.Model):
+    """
+        Classe responsável por gerar modelo do banco de dados para o registro do
+        saldo da conta bancária, ficando separado do restante das informações da
+        conta. E possuindo como relação o id da conta, onde uma conta pode possuir,
+        um dado sensível (saldo).
+    """
+
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     saldo = models.DecimalField(max_digits=15, decimal_places=2)
 
@@ -23,6 +30,13 @@ class ContaDadosSensiveis(models.Model):
 
 
 class Conta(AcoesConta, models.Model):
+    """
+        Classe responsável por gerar modelo do banco de dados para o registro
+        das contas, possui os seguintes campos: id, cliente_id, numero, agencia,
+        dta_criacao, dados_sensiveis_id e tipo. E possuindo como relação um cliente,
+        onde um cliente pode possuir somente uma conta.
+    """
+
     conta_tipo = [("P", "Poupança"), ("C", "Corrente")]
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)

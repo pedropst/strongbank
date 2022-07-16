@@ -60,7 +60,7 @@ def card_page():
             df = df[['DATA', 'DESCRIÇÃO', 'VALOR']]
             st.dataframe(df, width=1200)
 
-    if value_c and quantity_c and description_c and submit_c:
+    if value_c and quantity_c and submit_c:
         data = {"valor":value_c, "descricao":description_c, "parcelas":quantity_c}
         response = requests.post(url='http://127.0.0.1:8000/pagarcredito/', json=data, auth=get_account_info())
         if response.status_code == 200:
@@ -68,7 +68,7 @@ def card_page():
             st.experimental_rerun()
         else:
             st.write(response.json())
-    elif value_d and description_d and submit_d:
+    elif value_d and submit_d:
         data = {"valor":value_d, "descricao":description_d}
         response = requests.post(url='http://127.0.0.1:8000/pagardebito/', json=data, auth=get_account_info())
         if response.status_code == 200:

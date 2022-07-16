@@ -13,6 +13,10 @@ from strongbank.serializers.conta_serializer import ContaSerializer, ContaDadosS
 from strongbank.serializers.transacao_serializer import TransacaoSerializer
 
 class ContaViewset(viewsets.ModelViewSet):
+    """
+        Classe reponsável por implementar a view do endpoint da conta. Para esse 
+        endpoint é necessário autenticação para acessá-lo.
+    """
     serializer_class = ContaSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -22,6 +26,11 @@ class ContaViewset(viewsets.ModelViewSet):
 
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request, *args, **kwargs):
+        """
+            Método responsável pela criação de uma conta. A criação do dados
+            sensíveis de uma conta (saldo), também é criado e validado aqui antes
+            de criar a conta.
+        """
         cliente = Cliente.objects.filter(dono=request.user).all()[0]
         dados_sensiveis = request.data['dados_sensiveis']
 
@@ -50,6 +59,10 @@ class ContaViewset(viewsets.ModelViewSet):
         return Response(serializer.data, status=201)
 
     def list(self, request, *args, **kwargs):
+        """
+            Método que retorna informações sobre a conta para um usuário comum,
+            e sobre todas as contas para um usuário administrador.
+        """
         if request.user.is_superuser:
             queryset = Conta.objects.all()
             serializer = ContaSerializer(queryset, many=True)
@@ -60,11 +73,22 @@ class ContaViewset(viewsets.ModelViewSet):
         return Response(serializer.data, status=200)
 
 class SacarViewset(viewsets.ViewSet):
+    """
+        Classe reponsável por implementar a view do endpoint do saque. Para esse 
+        endpoint é necessário autenticação e ser o dono da conta para acessá-lo.
+        Portanto, usuários comuns que podem usar saque, já administradores não.
+    """
     serializer_class = SacarSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request):
+        """
+            Método responsável pela "criação" de um saque. Para isso é  necessário 
+            ter o valor, opcionalmente uma descrição e uma senha. Esse método 
+            também possui a lógica registrar uma transação referente ao depósito e
+            verifica a validação dos dados necessários para o saque.
+        """
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
 
@@ -83,19 +107,39 @@ class SacarViewset(viewsets.ViewSet):
         return Response({'status': 'Saque efetuado com sucesso!'}, status=200)
 
 class SaldoViewset(viewsets.ViewSet):
+    """
+        Classe reponsável por implementar a view do endpoint do saldo. Para esse 
+        endpoint é necessário autenticação e ser o dono da conta para acessá-lo.
+        Portanto, usuários comuns que podem usar saldo, já administradores não.
+    """
+
     serializer_class = SaldoSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def list(self, request):
+        """
+            Método responsável pela envio do saldo quando requisitado.
+        """
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
         return Response(conta.saldo, status=200)
 
 class ExtratoViewset(viewsets.ViewSet):
+    """
+        Classe reponsável por implementar a view do endpoint do extrato. Para esse 
+        endpoint é necessário autenticação e ser o dono da conta para acessá-lo.
+        Portanto, usuários comuns que podem usar extrato, já administradores não.
+    """
+
     serializer_class = TransacaoSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def create(self, request, *args, **kwargs):
+        """
+            Método responsável pela envio de um extrato. Para isso é  necessário 
+            ter a data inicial e final.
+        """
+
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
         transacoes = Transacao.objects.filter(cliente=cliente).all()
@@ -104,13 +148,26 @@ class ExtratoViewset(viewsets.ViewSet):
         return Response(serializer.data, status=200)
 
 class DepositarViewset(viewsets.ViewSet):
+    """
+        Classe reponsável por implementar a view do endpoint do depósito. Para esse 
+        endpoint é necessário autenticação e ser o dono da conta para acessá-lo.
+        Portanto, usuários comuns que podem usar depósito, já administradores não.
+    """
+
     serializer_class = DepositarSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def create(self, request, *args, **kwargs):
+        """
+            Método responsável pela "criação" de um depósito. Para isso é
+            necessário ter o valor e opcionalmente uma descrição. Esse método 
+            também possui a lógica registrar uma transação referente ao depósito.
+        """
+        
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
         
+        # TODO Validar depósito serializer antes de criar nova_transacao.
         nova_transacao = Transacao.objects.create(tipo='D',
                                                   cliente = cliente,
                                                   valor = request.data['valor'],
@@ -125,11 +182,26 @@ class DepositarViewset(viewsets.ViewSet):
         return Response({'status': 'Depósito efetuado com sucesso!'}, status=200)
 
 class TransferirViewset(viewsets.ViewSet):
+    """
+        Classe reponsável por implementar a view do endpoint da transferência. Para esse 
+        endpoint é necessário autenticação e ser o dono da conta para acessá-lo.
+        Portanto, usuários comuns que podem usar transferência, já administradores não.
+    """
+    
     serializer_class = TransferirSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request):
+        """
+            Método responsável pela "criação" de uma transferência. Para isso é
+            necessário ter o número, agência e documento da conta destinatária.
+            Esse método também possui a lógica para determinar quem é o remetente,
+            valida os dados da transferência e registra em duas transações a trans-
+            ferência, remetendo como transf. efetuada, e destinatário como transf.
+            recebida.
+        """
+
         cliente_remetente = Cliente.objects.get(dono=request.user)
         conta_remetente = Conta.objects.get(cliente=cliente_remetente)
 

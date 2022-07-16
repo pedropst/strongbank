@@ -2,6 +2,14 @@ from django.db import models
 
 
 class Cliente(models.Model):
+    """
+        Classe responsável por gerar modelo do banco de dados para o registro
+        dos clientes, possui os seguintes campos: nome, documento, endereco,
+        celular, dta_criacao, tipo e dono_id. Sendo esse último campo, uma chave
+        estrangeira que faz relação a tabela de usuários, onde um usuário pode
+        possuir somente um cliente.
+    """
+
     tipos_clientes = [("PF", "Física"), ("PJ", "Jurídica")]
 
     nome = models.CharField(max_length=80)

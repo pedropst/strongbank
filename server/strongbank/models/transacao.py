@@ -4,12 +4,17 @@ from django.db import models
 
 from uuid import uuid4
 
-import pytz
-
 from strongbank.models.cliente import Cliente
 
 
 class Transacao(models.Model):
+    """
+        Classe responsável por gerar modelo do banco de dados para o registro
+        das transações, possui os seguintes campos: id, cliente_id, tipo, valor,
+        dta_criacao e descrição. E possuindo como relação um cliente, onde um 
+        cliente pode possuir diversas transações.
+    """
+
     acoes_tipo = [
         ("S", "Saque"),
         ("D", "Deposito"),
@@ -18,6 +23,7 @@ class Transacao(models.Model):
         ("C", "Cartão"),
         ("PC", "Pagamento por Cartão"),
     ]
+    
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     # cliente = models.OneToOneField(Cliente, on_delete=models.CASCADE, unique=False)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)

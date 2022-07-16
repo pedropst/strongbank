@@ -7,6 +7,13 @@ from strongbank.models.cartao import Cartao
 
 
 class Fatura(models.Model):
+    """
+        Classe responsável por gerar o modelo do banco de dados para o registro 
+        das faturas do cartão de crédito, possui os seguintes campos: id, total,
+        parcial, cartao_id, mes_ref, ano_ref, dta_criacao. Possuindo relação com
+        o cartão, onde um cartão pode possuir várias faturas.
+    """
+
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     cartao = models.ForeignKey(Cartao, on_delete=models.CASCADE)
     mes_ref = models.IntegerField()
@@ -16,6 +23,10 @@ class Fatura(models.Model):
     dta_criacao = models.DateField(auto_now=True)
 
     def criar_vencimento(self):
+        """
+            Método responsável pela criação do mês e ano de referência da fatura.
+        """
+
         self.mes_ref = (datetime.today() + timedelta(days=31)).date().month
         self.ano_ref = (datetime.today() + timedelta(days=31)).date().year
 
