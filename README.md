@@ -107,19 +107,19 @@ Tem como objetivo detalhar conta específica.
 * Tem como objetivo o CRUD de cartões.
 * Requer: `dia_vencimento`, `limite_total`
 * GET: -> `{"id", "numeracao", "mes_validade", "ano_validade", "limite_total", "limite_desbloqueado", "limite_disponivel", "bloqueado", "cvv", "dia_vencimento"}` CODE 200
-* POST -> `{"dia_vencimento": "15", "limite_total": 5000}` CODE 201
+* POST: `{"dia_vencimento": "15", "limite_total": 5000}` CODE 201
 * https://user-images.githubusercontent.com/67083478/179382587-d7a8993a-110f-4e74-9747-fc05eaecb341.mp4
 
 ### /pagarcredito/
 * Tem como objetivo realizar um pagamento com cartão, no modo crédito.
 * Requer: `valor`, `parcelas`, `descricao`
-* POST -> `{"valor": 600, "parcelas": 12, "descricao": "Teste 1"}` CODE: 200
+* POST: `{"valor": 600, "parcelas": 12, "descricao": "Teste 1"}` CODE: 200
 * https://user-images.githubusercontent.com/67083478/179382773-1468aae7-0766-43ea-90c3-932dc087ba02.mp4
 
 ### /pagardebito/
 * Tem como objetivo realizar um pagamento com cartão, no modo débito.
 * Requer: `valor`, `descricao`
-* POST -> `{"valor": 600, "descricao": "Teste 1"}` CODE: 200
+* POST: `{"valor": 600, "descricao": "Teste 1"}` CODE: 200
 * https://user-images.githubusercontent.com/67083478/179382582-e65f25e6-d4e7-418a-b49a-4a03f99119c8.mp4
 
 ### /alterarbloqueio/
