@@ -23,11 +23,10 @@ Nele foi implementado todas as validações e regras de negócio.
 Os endpoints disponíveis e os requisitos para utilizá-los são:
 
 _____ Endpoints SEM autenticação ____
-### /user
+### /user/
 * Tem como objetivo o CRUD de usuários.
-* Verbos: GET, POST, PUT, DELETE
-* Requer: `username` `password`
-* GET: `{}`
+* Verbos: POST
+* Requer: `username` `password` `email` `tipo`
 * POST: 
 `{
 "username":"pedro",
@@ -37,77 +36,93 @@ _____ Endpoints SEM autenticação ____
 
 Onde tipo, pode ser "A", ou vazio, "". Sendo o primeiro caso para registro de superusers e o segundo para registro de usuários normais. A diferenciação entre esses dois tipos, está nas permissões que cada um tem. Usuários normais conseguem ver somente informações relacionadas ao mesmo. Já admins conseguem ver de todos, contudo, não conseguem exercer "ações" como: sacar, transferir, tirar extrato, depositar.
 
-____ Endpoints COM autenticação ____
-### /user/pk/
-Tem como objetivo detalhar usuário específico.
-* PUT: 
+* https://user-images.githubusercontent.com/67083478/179382960-9680fa29-73d7-43a4-936b-221d7c3c4249.mp4
+
+### /login/
+* Tem como objetivo o CRUD de usuários.
+* Verbos: POST
+* Requer: `username` `password`
+* POST: 
 `{
 "username":"pedro",
-"password":"123456"
+"password":"123456",
 }`
-* DELETE: `{}`
+* https://user-images.githubusercontent.com/67083478/179382996-b9972a2a-b74e-4d49-9604-2b94dcdead97.mp4
 
+
+
+____ Endpoints COM autenticação ____
 
 ### /cliente/
 * Tem como objetivo o CRUD de clientes.
 * Requer: `nome`, `endereco`,  `celular`. 
 * GET: `{}`
-* POST: `{"username":"pedro","password":"123456","cpf":"03336151133", "tipo": tipo}`
+* POST: `{"nome":"Pedro Henrique", "endereco":"Rua Tijuca, 110", "cpf":"03336681155", "cnpj":"", "tipo": tipo}`
+Onde tipo pode ser "PF" para pessoa física e "PJ" para pessoa jurídica.
+* https://user-images.githubusercontent.com/67083478/179382675-7b35dcf9-340c-433a-ab99-30a28856e4e7.mp4
 
 ### /cliente/pk/
 Tem como objetivo detalhar usuário específico.
-* PUT: 
-`{
-"nome" : "nome",
-"endereco" : "endereco",
-"celular" : "celular"
-}`
 * DELETE: `{}`
 
 
 ### /conta/
 * Tem como objetivo o CRUD de contas.
-* Requer: ~~`doc_cliente`~~, `saldo`, `agencia`
-* GET: `{}` -> `{"doc_cliente", "saldo", "agencia", "conta"}` CODE: 200
-* POST: `{"doc_cliente": "03336151133", "saldo": 3000, "agencia": "0001"}` -> CODE: 201
+* Requer: `saldo`, `agencia`
+* GET: `{}` -> `{"cliente", "saldo", "agencia", "numero", "tipo"}` CODE: 200
+* POST: `{"saldo": 3000, "agencia": "0001"}` -> CODE: 201
+* https://user-images.githubusercontent.com/67083478/179382655-0c9ac263-6bd4-4bcb-aa89-b606f886dd94.mp4
 
 ### /conta/pk/
-* Tem como objetivo detalhar conta específica.
-* DELETE: {}
+Tem como objetivo detalhar conta específica.
+* DELETE: `{}`
 
 ### /saldo
 * Tem como objetivo informar saldo disponível na conta.
-* GET: `{}` -> `{"saldo": 3000}` CODE: 200
+* GET: `{}` -> `{"saldo"}` CODE: 200
+* https://user-images.githubusercontent.com/67083478/179382635-36d89af1-431b-4691-b859-68fcf4177a9a.mp4
 
 ### /sacar/
 * Tem como objetivo sacar valor da conta.
 * POST: `{"valor": 1000, "senha": "123456", "descricao": "descricao"}` -> CODE: 200
+* https://user-images.githubusercontent.com/67083478/179382631-c3c4972a-661c-4052-a159-9da31500d5cb.mp4
 
 ### /depositar/
 * Tem como objetivo depositar na conta.
 * POST: `{"valor": 2500, "descricao": "descricao"}` -> CODE: 200
+* https://user-images.githubusercontent.com/67083478/179382624-1b2ab91f-c73d-4020-8f95-29534621af56.mp4
 
 ### /transferir/
 * Tem como objetivo transferir fundos de uma conta para outra.
-* POST: `{"doc_destinatario": "04135965788", "valor": 2500, "senha": "123456", "descricao": "descricao"}` -> CODE: 200
+* POST: `{"doc_destinatario": "04135965788", "valor": 2500, "senha": "123456", "descricao": "descricao", "agencia":"0001", "numero":"152689"}` -> CODE: 200
+* https://user-images.githubusercontent.com/67083478/179382602-2138d349-6181-49b2-94b9-206e525dd5d3.mp4
 
 ### /extrato/
 * Tem como objetivo gerar o extrato para um período de data informada.
 * POST: `{"dta_inicial": "11/07/2022", "dta_final": "11/07/2022"}` -> [{transacao1}, {transacao2}, ...] CODE 200
+* https://user-images.githubusercontent.com/67083478/179382599-fbdddade-cc8e-4dd8-acea-6bb91c36c2a6.mp4
 
 
 ### /cartao/
 * Tem como objetivo o CRUD de cartões.
-* Requer: `dia_vencimento`, `limite_total`, `limite_desbloqueado`, `limite_disponivel`
-* GET: -> `{"numeracao": "4138 5810 2586 9874", "mes_validade": "07", "ano_validade": "2030", "limite_total": 5000, "limite_desbloqueado": 3000, "limite_disponivel": 5000, "bloqueado": 0, "cvv":"341"}` CODE 200
+* Requer: `dia_vencimento`, `limite_total`
+* GET: -> `{"id", "numeracao", "mes_validade", "ano_validade", "limite_total", "limite_desbloqueado", "limite_disponivel", "bloqueado", "cvv", "dia_vencimento"}` CODE 200
 * POST -> `{"dia_vencimento": "15", "limite_total": 5000}` CODE 201
-* 
-### /pagarcredito/
-* Tem como objetivo realizar um pagamento com cartão, no modo crédito.
-* Requer: `valor`, `parcelas`
-* POST -> `{"valor": 600, "parcelas": 12}` CODE: 200
+* https://user-images.githubusercontent.com/67083478/179382587-d7a8993a-110f-4e74-9747-fc05eaecb341.mp4
 
 ### /pagarcredito/
+* Tem como objetivo realizar um pagamento com cartão, no modo crédito.
+* Requer: `valor`, `parcelas`, `descricao`
+* POST -> `{"valor": 600, "parcelas": 12, "descricao": "Teste 1"}` CODE: 200
+* https://user-images.githubusercontent.com/67083478/179382773-1468aae7-0766-43ea-90c3-932dc087ba02.mp4
+
+### /pagardebito/
 * Tem como objetivo realizar um pagamento com cartão, no modo débito.
-* Requer: `valor`
-* POST -> `{"valor": 600}` CODE: 200
+* Requer: `valor`, `descricao`
+* POST -> `{"valor": 600, "descricao": "Teste 1"}` CODE: 200
+* https://user-images.githubusercontent.com/67083478/179382582-e65f25e6-d4e7-418a-b49a-4a03f99119c8.mp4
+
+### /alterarbloqueio/
+* Tem como objetivo alternar entre cartão bloqueado e desbloqueado.
+* Post: `{}`
+* https://user-images.githubusercontent.com/67083478/179383293-a65bf5d2-7077-46ba-a8f0-e3c35583f6b4.mp4
