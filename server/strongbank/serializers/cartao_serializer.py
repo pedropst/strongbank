@@ -135,32 +135,3 @@ class PagarDebitoSerializer(serializers.Serializer):
 class AlterarBloqueioSerializer(serializers.Serializer):
     def validate(self, attrs):
         return super().validate(attrs)
-
-class AlterarLimiteSerializer(serializers.Serializer):
-    """
-        Classe reponsável por implementar as validações da mudança de limite.
-    """
-
-    class Meta:
-        fields = ['valor', 'descricao']
-
-    def validate(self, request):
-        """
-            Método responsável por verificar que request possui o campo
-            necessário para efetuar a mudança de limite: valor.
-        """
-
-        if 'valor' not in (self.context.data.keys()):
-            raise serializers.ValidationError({'ERRO':'O "valor" não informado.'}, code=400)
-        return super().validate(request)
-
-    def validate_valor(self, valor):
-        """
-            Método responsável por verificar que request possui o campo 'valor'
-            maior do que 0.
-        """
-
-        if valor <= 0:
-            raise serializers.ValidationError(('Valor INVÁLIDO.'), code=400)
-        return valor
-

@@ -1,6 +1,7 @@
 from datetime import datetime, date
 from decimal import Decimal
 import json
+from typing import List
 import pytz
 
 from src.exceptions.saldo_insuficiente_saque_error import SaldoInsuficienteParaSaqueError
@@ -21,6 +22,10 @@ class AcoesConta():
         return self.dados_sensiveis.saldo
         
     def sacar(self, quantidade: float) -> None:
+        """
+            Método responsável pela lógica e a aprovação ou não de um saque.
+        """
+
         quantidade = Decimal(quantidade)
         if self.dados_sensiveis.saldo >= quantidade:
             self.dados_sensiveis.saldo -= quantidade
@@ -29,11 +34,19 @@ class AcoesConta():
             raise SaldoInsuficienteParaSaqueError({'ERRO':'Saque não permitido: saldo insuficiente.'})
     
     def depositar(self, quantidade: Decimal) -> None:
+        """
+            Método responsável pela lógica e a aprovação ou não de um depósito.
+        """
+
         quantidade = Decimal(quantidade)
         self.dados_sensiveis.saldo += quantidade
         self.dados_sensiveis.save()
     
     def transferir(self, quantidade: Decimal, destinatario: object) -> None:
+        """
+            Método responsável pela lógica e a aprovação ou não de uma transferência.
+        """
+
         quantidade = Decimal(quantidade)
         if self.dados_sensiveis.saldo >= quantidade:
             destinatario.depositar(quantidade)
@@ -42,7 +55,11 @@ class AcoesConta():
             raise SaldoInsuficienteParaTransferenciaError({'ERRO':'Transferência não permitida: saldo insuficiente'})
 
 
-    def extrato(self, dta_inicial: str, dta_final: str, transacoes: list) -> json:
+    def extrato(self, dta_inicial: str, dta_final: str, transacoes: list) -> List[dict]:
+        """
+            Método responsável pela lógica e a aprovação ou não de um extrato.
+        """
+
         data_inicial = datetime.strptime(dta_inicial, r'%d/%m/%Y').replace(hour=0, minute=0, second=0).astimezone(pytz.timezone('America/Sao_Paulo'))
         data_final = datetime.strptime(dta_final, r'%d/%m/%Y').replace(hour=22, minute=59, second=59).astimezone(pytz.timezone('America/Sao_Paulo'))
 
@@ -58,16 +75,3 @@ class AcoesConta():
         # for i, x in enumerate(transacoes_filtradas):
         #     extrato_gerado[i] = f'{x.dta_criacao.strftime(r"%d/%m/%Y")}: {tradutor[x.tipo]}, no valor de R${x.valor:.2f}'
         return transacoes_filtradas
-
-
-    def pagar_boleto(self, codigo: str) -> None:
-        pass
-
-    def usar_cartao(self, valor: Decimal) -> bool:
-        if self.dados_sensiveis.saldo >= valor:
-            self.dados_sensiveis.saldo -= valor
-            self.dados_sensiveis.save()
-            return True
-        else:
-            raise SaldoInsuficienteParaTransferenciaError({'ERRO': 'Transferência não permitida: saldo insuficiente'})
-

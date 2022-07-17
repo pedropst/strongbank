@@ -2,7 +2,6 @@ from datetime import datetime
 from decimal import Decimal
 from django.db import transaction
 from random import randint
-from rest_framework.decorators import api_view
 from rest_framework import permissions
 from rest_framework import serializers
 from rest_framework import viewsets
@@ -15,18 +14,23 @@ from strongbank.models.fatura import Fatura
 from strongbank.models.parcela import Parcela
 from strongbank.models.transacao import Transacao
 from strongbank.permissions import IsOwnerOrReadOnly, IsUpdateProfile
-from strongbank.serializers.cartao_serializer import  CartaoSerializer, PagarCreditoSerializer, PagarDebitoSerializer, AlterarBloqueioSerializer, AlterarLimiteSerializer
+from strongbank.serializers.cartao_serializer import  CartaoSerializer, PagarCreditoSerializer, PagarDebitoSerializer, AlterarBloqueioSerializer
+
 
 class PagarCreditoViewset(viewsets.ViewSet):
     """
-        Classe reponsável por implementar o endpoint do pagamento por creédito.
-        Esse endpoint requer autenticação para acessá-lo.
+        Classe reponsável por implementar o endpoint do pagamento por crédito.
+        Esse endpoint requer autenticação do dono para acessá-lo.
     """
     serializer_class = PagarCreditoSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request):
+        """
+            Método responsável pela "criação" de um pagamento por crédito. Para 
+            isso é necessário ter o valor e a quantidade de parcelas.
+        """
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
         cartao = Cartao.objects.get(conta=conta)
@@ -85,11 +89,20 @@ class PagarCreditoViewset(viewsets.ViewSet):
 
 
 class PagarDebitoViewset(viewsets.ViewSet):
+    """
+        Classe reponsável por implementar o endpoint do pagamento por débito.
+        Esse endpoint requer autenticação do dono para acessá-lo.
+    """
     serializer_class = PagarDebitoSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request):
+        """
+            Método responsável pela "criação" de um pagamento por débito. Para 
+            isso é necessário ter o valor e a quantidade de parcelas.
+        """
+
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
         cartao = Cartao.objects.get(conta=conta)
@@ -108,10 +121,19 @@ class PagarDebitoViewset(viewsets.ViewSet):
         return Response({'status': 'Pagamento realizado com sucesso!'}, status=200)
 
 class AlterarBloqueioViewset(viewsets.ViewSet):
+    """
+        Classe reponsável por implementar o endpoint do bloqueio ou desbloqueio
+        do cartão. Esse endpoint requer autenticação do dono para acessá-lo.
+    """
     serializer_class = AlterarBloqueioSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def create(self, request):
+        """
+            Método responsável pela "criação" de um bloqueio do cartão ou desbloqueio.
+            Para isso é necessário ter o valor e a quantidade de parcelas.
+        """
+
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
         cartao = Cartao.objects.get(conta=conta)
@@ -125,32 +147,19 @@ class AlterarBloqueioViewset(viewsets.ViewSet):
             return Response({'status': 'Cartão bloqueado com sucesso!'}, status=200)
     
     def list(self, request):
+        """
+            Método que retorna informações sobre o bloqueio do cartão para o dono.
+        """
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
         cartao = Cartao.objects.get(conta=conta)
         return Response(cartao.bloqueado, status=200)
-
-class AlterarLimiteViewset(viewsets.ViewSet):
-    serializer_class = AlterarLimiteSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
-
-    def create(self, request):
-        cliente = Cliente.objects.get(dono=request.user)
-        conta = Conta.objects.get(cliente=cliente)
-        cartao = Cartao.objects.get(conta=conta)
-
-        cartao.alterar_limite(request.data['valor'])
-
-        return Response({'status': 'Cartão bloqueado com sucesso!'}, status=200)
-    
-    def list(self, request):
-        cliente = Cliente.objects.get(dono=request.user)
-        conta = Conta.objects.get(cliente=cliente)
-        cartao = Cartao.objects.get(conta=conta)
-        return Response(cartao.bloqueado, status=200)
-
 
 class CartaoViewset(viewsets.ModelViewSet):
+    """
+        Classe reponsável por implementar o endpoint do cartão. 
+        Esse endpoint requer autenticação para acessá-lo.
+    """
     serializer_class = CartaoSerializer
     permission_classes = [permissions.IsAuthenticated]
     # TODO Verificar se não é necessário fazer partial update para salvar o valor da fatura do cartão
@@ -173,6 +182,12 @@ class CartaoViewset(viewsets.ModelViewSet):
 
     @transaction.atomic # To create either BOTH or NONE
     def create(self, request, *args, **kwargs):
+        """
+            Método responsável pela criação de um cartão. A criação do dados
+            sensíveis de um cartão (cvv), também é criado e validado aqui antes
+            de criar o cartão.
+        """
+
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
         dados = CartaoDadosSensiveis.objects.create(cvv=str(randint(100,999)))
@@ -213,15 +228,14 @@ class CartaoViewset(viewsets.ModelViewSet):
                                             numeracao=numeracao,
                                             limite_total=Decimal(request.data['limite_total']),
                                             limite_desbloqueado=Decimal(request.data['limite_total'])*Decimal(0.8),
-                                            limite_disponivel=Decimal(request.data['limite_total']),
-                                            limite_escolhido=Decimal(request.data['limite_total'])*Decimal(0.8))
+                                            limite_disponivel=Decimal(request.data['limite_total']))
+
         request.data['dados_sensiveis'] = dados
         request.data['nome'] = nome
         request.data['numeracao'] = numeracao
         request.data['limite_total'] = Decimal(request.data['limite_total'])
-        request.data['limite_desbloqueado'] = 0
-        request.data['limite_disponivel'] = 0
-        request.data['limite_escolhido'] = 0
+        request.data['limite_desbloqueado'] = Decimal(request.data['limite_total'])*Decimal(0.8)
+        request.data['limite_desbloqueado'] = Decimal(request.data['limite_total'])
 
         serializer = CartaoSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -232,10 +246,16 @@ class CartaoViewset(viewsets.ModelViewSet):
 
         return Response(serializer.data, status=201)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request):
+        """
+            Método que retorna informações sobre o cartão para um usuário comum,
+            e sobre todas os cartões para um usuário administrador.
+        """
+        
         if request.user.is_superuser:
             queryset = Cartao.objects.all()
             serializer = CartaoSerializer(queryset, many=True)
+            return Response(serializer.data, status=200)
         else:
             cliente = Cliente.objects.get(dono=request.user)
             conta = Conta.objects.get(cliente=cliente)
@@ -243,4 +263,4 @@ class CartaoViewset(viewsets.ModelViewSet):
             serializer = CartaoSerializer(queryset)
             cartao = dict(serializer.data)
             cartao.pop('id')
-        return Response(cartao, status=200)
+            return Response(cartao, status=200)

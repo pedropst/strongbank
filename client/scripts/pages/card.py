@@ -27,14 +27,6 @@ def card_page():
     with st.expander('Gerenciar'):
         card_status = 'Desbloquear Cartão' if get_cartao()['bloqueado'] else 'Bloquear Cartão'
         change_card_status = st.button(card_status)
-        # min_value = 0.0
-        # max_value = float(get_cartao()['limite_total'])
-        # new_unlock_limit = st.slider(label=f"Limite desbloqueado - R$ {get_cartao()['limite_desbloqueado']}", 
-        #                              min_value=min_value, max_value=max_value, step=100.0, 
-        #                              format=f"R$ %f".replace(',', '*').replace('.',',').replace('*','.'), 
-        #                              value=(float(get_cartao()['limite_total']) - float(get_cartao()['limite_disponivel']) + float(get_cartao()['limite_desbloqueado'])))
-        # st.write(f'Novo limite - R$ {new_unlock_limit:,.2f}'.replace(',', '*').replace('.',',').replace('*','.'))
-        # button_new_limit = st.button('Alterar limite')
 
     with st.expander('Pagar com crédito:'):
         with st.form('credit_payment_form'):
@@ -54,7 +46,7 @@ def card_page():
             submit_d = st.form_submit_button(label='Confirmar')
 
     with st.expander('Faturas'):
-        data = {"numeracao":get_cartao()['numeracao']}  
+        data = {}  
         response = requests.get(url='http://127.0.0.1:8000/fatura/', json=data, auth=get_account_info())
         data = response.json()['FATURAS']
         parcelas = response.json()['PARCELAS']
@@ -65,20 +57,11 @@ def card_page():
         if fatura != None:
             index = options.index(fatura)
             parcelas = [p for p in parcelas if p['fatura'] == data[index]['id']]
-            # breakpoint()
             df = pd.DataFrame(parcelas)
             df = df.drop(['id', 'fatura'], axis=1)
             df = df.rename(columns={'descricao':'DESCRIÇÃO', 'valor':'VALOR', 'dta_criacao': 'DATA'})
             df = df[['DATA', 'DESCRIÇÃO', 'VALOR']]
             st.dataframe(df, width=1200)
-
-    # if button_new_limit:
-    #     response = requests.post(url='http://127.0.0.1:8000/alterarlimite/', json={'valor':new_unlock_limit}, auth=get_account_info())
-    #     if response.status_code == 200:
-    #         st.legacy_caching.clear_cache()
-    #         st.experimental_rerun()
-    #     else:
-    #         st.write(response.json())
 
     if change_card_status:
         response = requests.post(url='http://127.0.0.1:8000/alterarbloqueio/', json={}, auth=get_account_info())
@@ -104,26 +87,7 @@ def card_page():
             st.experimental_rerun()
         else:
             st.write(response.json())
-    
-    
-    #         _, b, c, _, _ = st.columns(5)
-    # # with b:
-    # #     data = {"numeracao":get_cartao()['numeracao']} 
-    # #     bloquear = st.select_slider('Bloqueado', options=['SIM', 'NÃO'], value='NÃO')
-    # #     response = requests.get(url='http://127.0.0.1:8000/cartao/', json=data, auth=get_account_info())
-    # #     # breakpoint()
-    # #     id = response.json()['id']
-    # #     data = response.json()
-
-    # #     if bloquear == 'SIM':
-    # #         data['bloqueado'] = True
-    # #         response = requests.patch(url=f'http://127.0.0.1:8000/cartao/{id}', json=data, auth=get_account_info())
-    # #         breakpoint()
-    # #     else:
-    # #         data['bloqueado'] = False
-    # #         response = requests.patch(url=f'http://127.0.0.1:8000/cartao/{id}', json=data, auth=get_account_info())
-
-    
+       
     html = """    <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
         <img src='data:image/png;base64,{img_to_bytes()}' style="width: 25%; height: auto;" class="img-fluid">
     </div>"""

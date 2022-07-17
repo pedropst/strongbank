@@ -38,7 +38,8 @@ def transfer_page():
                     "doc_destinatario":receiver_document,
                     "numero": receiver_account_number,
                     "agencia": receiver_branch,
-                    "senha": password
+                    "senha": password,
+                    "descricao": description
                }
         response = requests.post(url='http://127.0.0.1:8000/transferir/', json=data, auth=get_account_info())
 

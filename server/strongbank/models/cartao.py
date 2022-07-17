@@ -4,7 +4,7 @@ from typing import Any
 from django.db import models
 from uuid import uuid4
 
-from strongbank.entities.credito_debito import AcoesCartao
+from strongbank.entities.acoes_cartao import AcoesCartao
 from strongbank.models.conta import Conta
 
 
@@ -48,8 +48,6 @@ class Cartao(AcoesCartao, models.Model):
     limite_disponivel = models.DecimalField(
         max_digits=15, decimal_places=2, default=Decimal(0))
     limite_desbloqueado = models.DecimalField(
-        max_digits=15, decimal_places=2, default=Decimal(0))
-    limite_escolhido = models.DecimalField(
         max_digits=15, decimal_places=2, default=Decimal(0))
     bandeira = models.CharField(max_length=20)
 

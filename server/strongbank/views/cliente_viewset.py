@@ -8,12 +8,21 @@ from strongbank.serializers.cliente_serializer import ClienteSerializer
 from rest_framework import status
 
 class ClienteViewset(viewsets.ModelViewSet):
+    """
+        Classe reponsável por implementar o endpoint do cliente. 
+        Esse endpoint requer autenticação para acessá-lo.
+    """
+
     queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer    
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     
     @transaction.atomic # To create either BOTH or NONE
-    def create(self, request, *args, **kwargs):
+    def create(self, request):
+        """
+            Método responsável pela criação de um cliente.
+        """
+
         request.data['documento'] = request.data['cpf'] if request.data['tipo'] == 'PF' else request.data['cnpj']
         serializer = ClienteSerializer(data=request.data, context=request)
         serializer.is_valid(raise_exception=True)
@@ -28,7 +37,12 @@ class ClienteViewset(viewsets.ModelViewSet):
 
         return Response(serializer.data, status=201)
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request):
+        """
+            Método que retorna informações sobre o cliente para um usuário comum,
+            e sobre todas os clientes para um usuário administrador.
+        """
+
         if request.user.is_superuser:
             queryset = Cliente.objects.all()
             serializer = ClienteSerializer(queryset, many=True)
@@ -36,4 +50,3 @@ class ClienteViewset(viewsets.ModelViewSet):
             queryset = Cliente.objects.get(dono=request.user)
             serializer = ClienteSerializer(queryset)
         return Response(serializer.data, status=200)
-

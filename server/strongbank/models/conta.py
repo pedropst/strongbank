@@ -3,7 +3,7 @@ from uuid import uuid4
 from django.core.signing import Signer
 from django.db import models
 
-from strongbank.entities.conta import AcoesConta
+from strongbank.entities.acoes_conta import AcoesConta
 from strongbank.models.cliente import Cliente
 
 

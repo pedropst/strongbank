@@ -13,19 +13,29 @@ from strongbank.serializers.parcela_serializer import ParcelaSerializer
 
 
 class FaturaViewset(viewsets.ModelViewSet):
+    """
+        Classe reponsável por implementar da fatura. Essa classe é somente acessada
+        pela classe de pagamento por meio de cartão de crédito.
+    """
+
     serializer_class = ParcelaSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def list(self, request):
+        """
+            Método que retorna informações sobre a fatura para um usuário comum,
+            e sobre todas as faturas para um usuário administrador.
+        """
+
         cliente = Cliente.objects.get(dono=request.user)
         conta = Conta.objects.get(cliente=cliente)
         cartao = Cartao.objects.get(conta=conta)
         fatura =  Fatura.objects.filter(cartao=cartao).all()
-        parcela = Parcela.objects.all()
+        parcela = []
+        for f in fatura:
+            for p in Parcela.objects.filter(fatura=f).all():
+                parcela.append(p)
 
         serializer = FaturaSerializer(fatura, many=True)
         serializer2 = ParcelaSerializer(parcela, many=True)
         return Response({'FATURAS': serializer.data, 'PARCELAS': serializer2.data}, status=200)
-
-
-        

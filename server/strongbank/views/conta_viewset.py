@@ -31,6 +31,7 @@ class ContaViewset(viewsets.ModelViewSet):
             sensíveis de uma conta (saldo), também é criado e validado aqui antes
             de criar a conta.
         """
+        
         cliente = Cliente.objects.filter(dono=request.user).all()[0]
         dados_sensiveis = request.data['dados_sensiveis']
 
@@ -217,7 +218,8 @@ class TransferirViewset(viewsets.ViewSet):
         # TODO Validar depósito serializer antes de criar nova_transacao.
         nova_transacao = Transacao.objects.create(tipo='TE',
                                                   cliente = cliente_remetente,
-                                                  valor = request.data['valor'])
+                                                  valor = request.data['valor'],
+                                                  descricao = request.data['descricao'])
         nova_transacao.save()
 
         # TODO Validar depósito serializer antes de criar nova_transacao.
