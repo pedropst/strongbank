@@ -19,6 +19,14 @@ Tem como objetivo simular como seria uma aplicação para um banco digital, feit
 Tem como objetivo simular o lado do servidor de um banco digital que disponibiliza por meio dos endpoints da API maneiras de comunicar-se com o server.
 Nele foi implementado todas as validações e regras de negócio.
 
+## Passo a passo
+1. Iniciar um ambiente virtual com `python -m venv .venv`.
+2. Ativar o ambiente virtual com `.venv\scripts\activate`.
+3. Instalar todas as dependências com `pip install -r requirements.txt`.
+4. Configurar o arquivo .env com o banco de dados de sua preferência e as credencias do mesmo.
+5. Iniciar a API com `python server/manage.py runserver`
+6. Iniciar o frontend com `streamlit run client/scripts/app.py`
+
 ## API - Endpoints
 Os endpoints disponíveis e os requisitos para utilizá-los são:
 
