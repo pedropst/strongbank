@@ -111,3 +111,9 @@ Tem como objetivo detalhar usuário específico.
 * Tem como objetivo realizar um pagamento com cartão, no modo débito.
 * Requer: `valor`
 * POST -> `{"valor": 600}` CODE: 200
+
+
+
+
+https://user-images.githubusercontent.com/67083478/179382539-cb295543-ae8d-4dfc-a30f-0e7dc2e08fe0.mp4
+
