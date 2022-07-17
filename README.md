@@ -24,8 +24,8 @@ Nele foi implementado todas as validações e regras de negócio.
 2. Ativar o ambiente virtual com `.venv\scripts\activate`.
 3. Instalar todas as dependências com `pip install -r requirements.txt`.
 4. Configurar o arquivo .env com o banco de dados de sua preferência e as credencias do mesmo.
-5. Iniciar a API com `python server/manage.py runserver`
-6. Iniciar o frontend com `streamlit run client/scripts/app.py`
+5. Iniciar a API com `python server/manage.py runserver`.
+6. Iniciar o frontend com `streamlit run client/scripts/app.py`.
 
 ## API - Endpoints
 Os endpoints disponíveis e os requisitos para utilizá-los são:
