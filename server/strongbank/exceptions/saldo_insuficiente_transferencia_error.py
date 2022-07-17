@@ -1,4 +1,4 @@
-from src.exceptions.saldo_insuficiente_error import SaldoInsuficienteError
+from strongbank.exceptions.saldo_insuficiente_error import SaldoInsuficienteError
 
 
 class SaldoInsuficienteParaTransferenciaError(SaldoInsuficienteError):

@@ -1,11 +1,10 @@
 from datetime import datetime, date
 from decimal import Decimal
-import json
 from typing import List
 import pytz
 
-from src.exceptions.saldo_insuficiente_saque_error import SaldoInsuficienteParaSaqueError
-from src.exceptions.saldo_insuficiente_transferencia_error import SaldoInsuficienteParaTransferenciaError
+from strongbank.exceptions.saldo_insuficiente_saque_error import SaldoInsuficienteParaSaqueError
+from strongbank.exceptions.saldo_insuficiente_transferencia_error import SaldoInsuficienteParaTransferenciaError
 
 
 class AcoesConta(): 

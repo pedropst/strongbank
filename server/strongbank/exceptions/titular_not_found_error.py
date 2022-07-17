@@ -1,4 +1,4 @@
-from src.exceptions.not_found_error import NotFoundError
+from strongbank.exceptions.not_found_error import NotFoundError
 
 
 class TitularNotFoundError(NotFoundError):

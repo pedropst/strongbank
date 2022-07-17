@@ -1,4 +1,4 @@
-from src.exceptions.base_conta_error import BaseContaError
+from strongbank.exceptions.base_conta_error import BaseContaError
 
 
 class SaldoInsuficienteError(BaseContaError):
