@@ -23,7 +23,7 @@ Nele foi implementado todas as validações e regras de negócio.
 Os endpoints disponíveis e os requisitos para utilizá-los são:
 
 _____ Endpoints SEM autenticação ____
-### /user
+### /user/
 * Tem como objetivo o CRUD de usuários.
 * Verbos: POST
 * Requer: `username` `password` `email` `tipo`
@@ -38,7 +38,7 @@ Onde tipo, pode ser "A", ou vazio, "". Sendo o primeiro caso para registro de su
 
 * https://user-images.githubusercontent.com/67083478/179382960-9680fa29-73d7-43a4-936b-221d7c3c4249.mp4
 
-### /login
+### /login/
 * Tem como objetivo o CRUD de usuários.
 * Verbos: POST
 * Requer: `username` `password`
