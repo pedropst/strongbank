@@ -132,5 +132,5 @@ Tem como objetivo detalhar conta específica.
 
 ### /alterarbloqueio/
 * Tem como objetivo alternar entre cartão bloqueado e desbloqueado.
-* Post: `{}`
+* Post: `{}` CODE: 200
 * https://user-images.githubusercontent.com/67083478/179383293-a65bf5d2-7077-46ba-a8f0-e3c35583f6b4.mp4
