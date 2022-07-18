@@ -46,12 +46,24 @@ class CartaoTestCase(TestCase):
         self.dados = CartaoDadosSensiveis.objects.create(cvv="300")
         self.client_auth.post('/cartao/', {"dia_vencimento": "10", "limite_total":"1000"}, format='json')
 
-    def test_acao_cartao_pagar_com_credito(self):
+    def test_acao_cartao_pagar_com_credito_com_cartao_bloqueado(self):
+        response = self.client_auth.post('/pagarcredito/', payloadC, format='json')
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_acao_cartao_pagar_com_debito_com_cartao_bloqueado(self):
+        response = self.client_auth.post('/pagardebito/', payloadD, format='json')
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_acao_cartao_pagar_com_credito_com_cartao_desbloqueado(self):
+        self.client_auth.post('/alterarbloqueio/', {}, format='json')
         response = self.client_auth.post('/pagarcredito/', payloadC, format='json')
 
         self.assertEqual(response.status_code, 200)
 
-    def test_acao_cartao_pagar_com_debito(self):
+    def test_acao_cartao_pagar_com_debito_com_cartao_desbloqueado(self):
+        self.client_auth.post('/alterarbloqueio/', {}, format='json')
         response = self.client_auth.post('/pagardebito/', payloadD, format='json')
 
         self.assertEqual(response.status_code, 200)

@@ -17,7 +17,8 @@ payload = {
             "doc_destinatario":"12345678902",
             "numero":"",
             "agencia":"",
-            "senha":"123456"
+            "senha":"123456",
+            "descricao":""
           }
 
 payload_incorreto = {
